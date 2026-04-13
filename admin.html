@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CFGDROP — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#030303;--s1:#0a0a0a;--s2:#0f0f0f;
+  --border:#1a1a1a;--border2:#242424;
+  --cyan:#00e5ff;--green:#00ff87;--yellow:#ffe600;
+  --red:#ff3b3b;--orange:#ff9500;
+  --text:#f0f0f0;--muted:#3a3a3a;--dim:#555;
+  --font-d:'Orbitron',sans-serif;--font-b:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);min-height:100vh;}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.02) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+
+#login-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.login-box{width:100%;max-width:380px;padding:40px;background:var(--s1);border:1px solid var(--border);position:relative;}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
+.login-title{font-family:var(--font-d);font-size:14px;font-weight:900;letter-spacing:4px;color:var(--cyan);margin-bottom:4px;text-shadow:0 0 20px rgba(0,229,255,0.3);}
+.login-sub{font-size:10px;color:var(--dim);letter-spacing:2px;margin-bottom:32px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:10px;color:var(--dim);letter-spacing:2px;margin-bottom:6px;}
+.field input{width:100%;padding:10px 12px;background:var(--s2);border:1px solid var(--border2);color:var(--text);font-family:var(--font-b);font-size:12px;outline:none;transition:border-color 0.15s;}
+.field input:focus{border-color:var(--cyan);}
+.login-btn{width:100%;padding:12px;margin-top:8px;font-family:var(--font-d);font-size:11px;letter-spacing:3px;font-weight:700;cursor:pointer;background:var(--cyan);color:#000;border:none;transition:all 0.15s;}
+.login-btn:hover{background:#fff;}
+.login-btn:disabled{background:var(--border2);color:var(--dim);cursor:not-allowed;}
+.login-error{font-size:10px;color:var(--red);margin-top:12px;letter-spacing:1px;display:none;}
+
+#app{display:none;position:relative;z-index:1;min-height:100vh;}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:200px;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:50;}
+.sidebar-logo{padding:20px;border-bottom:1px solid var(--border);font-family:var(--font-d);font-size:13px;font-weight:900;letter-spacing:3px;color:var(--cyan);}
+.sidebar-logo span{color:var(--text);}
+.sidebar-user{padding:12px 20px;font-size:9px;color:var(--dim);letter-spacing:1px;border-bottom:1px solid var(--border);word-break:break-all;}
+.nav-items{padding:16px 0;flex:1;}
+.nav-item{padding:11px 20px;font-size:11px;letter-spacing:2px;cursor:pointer;color:var(--dim);display:flex;align-items:center;gap:10px;transition:all 0.15s;border-left:2px solid transparent;}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,0.02);}
+.nav-item.active{color:var(--cyan);border-left-color:var(--cyan);background:rgba(0,229,255,0.04);}
+.nav-icon{font-size:14px;width:20px;text-align:center;}
+.logout-btn{padding:16px 20px;font-size:10px;color:var(--dim);cursor:pointer;border-top:1px solid var(--border);letter-spacing:1px;background:none;border-bottom:none;border-left:none;border-right:none;font-family:var(--font-b);text-align:left;width:100%;transition:color 0.15s;}
+.logout-btn:hover{color:var(--red);}
+.main{margin-left:200px;padding:32px;min-height:100vh;}
+.panel{display:none;}.panel.active{display:block;}
+.panel-title{font-family:var(--font-d);font-size:16px;font-weight:700;letter-spacing:3px;margin-bottom:4px;}
+.panel-sub{font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:32px;}
+.card{background:var(--s1);border:1px solid var(--border);padding:24px;margin-bottom:16px;position:relative;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--cyan),transparent);opacity:0.3;}
+.card-title{font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:20px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.form-row.full{grid-template-columns:1fr;}
+.form-group label{display:block;font-size:10px;color:var(--dim);letter-spacing:2px;margin-bottom:6px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;background:var(--s2);border:1px solid var(--border2);color:var(--text);font-family:var(--font-b);font-size:12px;outline:none;transition:border-color 0.15s;resize:vertical;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--cyan);}
+.form-group select option{background:var(--s1);}
+.drop-zone{border:1px dashed var(--border2);padding:32px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--cyan);background:rgba(0,229,255,0.03);}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.drop-icon{font-size:28px;margin-bottom:8px;}
+.drop-text{font-size:11px;color:var(--dim);letter-spacing:1px;margin-bottom:4px;}
+.drop-sub{font-size:10px;color:var(--muted);letter-spacing:1px;}
+.drop-filename{font-size:11px;color:var(--cyan);margin-top:8px;display:none;}
+.btn{padding:11px 24px;font-family:var(--font-d);font-size:11px;letter-spacing:2px;font-weight:700;cursor:pointer;border:none;transition:all 0.15s;}
+.btn-primary{background:var(--cyan);color:#000;}
+.btn-primary:hover{background:#fff;}
+.btn-primary:disabled{background:var(--border2);color:var(--dim);cursor:not-allowed;}
+.btn-danger{background:transparent;color:var(--red);border:1px solid var(--red);}
+.btn-danger:hover{background:var(--red);color:#fff;}
+.btn-sm{padding:6px 14px;font-size:9px;}
+.progress-wrap{display:none;margin-top:16px;}
+.progress-label{font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:6px;}
+.progress-bar{height:3px;background:var(--border2);position:relative;overflow:hidden;}
+.progress-fill{height:100%;background:var(--cyan);width:0%;transition:width 0.3s ease;box-shadow:0 0 8px var(--cyan);}
+.upload-status{font-size:11px;margin-top:8px;display:none;}
+.config-list{display:flex;flex-direction:column;gap:8px;}
+.config-item{background:var(--s2);border:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;gap:16px;transition:border-color 0.15s;}
+.config-item:hover{border-color:var(--border2);}
+.config-item-badge{font-size:9px;letter-spacing:1px;padding:3px 8px;border:1px solid rgba(0,229,255,0.3);color:var(--cyan);background:rgba(0,229,255,0.06);flex-shrink:0;}
+.config-item-info{flex:1;min-width:0;}
+.config-item-title{font-size:13px;font-weight:500;margin-bottom:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.config-item-meta{font-size:10px;color:var(--dim);}
+.config-item-dl{font-size:11px;color:var(--dim);flex-shrink:0;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;}
+.stat-box{background:var(--s1);border:1px solid var(--border);padding:16px;}
+.stat-box-num{font-size:24px;font-weight:500;color:var(--cyan);}
+.stat-box-label{font-size:9px;color:var(--dim);letter-spacing:1px;margin-top:4px;}
+.scan-btn{width:100%;padding:13px;margin-bottom:20px;font-family:var(--font-d);font-size:12px;letter-spacing:3px;font-weight:700;cursor:pointer;background:var(--yellow);color:#000;border:none;transition:all 0.15s;}
+.scan-btn:disabled{background:rgba(255,230,0,0.1);color:var(--yellow);cursor:not-allowed;border:1px solid rgba(255,230,0,0.2);}
+.scan-log{background:var(--s2);border:1px solid var(--border);padding:14px;margin-bottom:20px;font-size:10px;color:var(--dim);line-height:2;max-height:150px;overflow-y:auto;display:none;}
+.trend-card{background:var(--s2);border:1px solid var(--border);border-left:3px solid var(--yellow);padding:16px 20px;cursor:pointer;transition:all 0.15s;margin-bottom:8px;}
+.trend-card:hover{border-color:var(--border2);}
+.trend-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+.trend-badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px;}
+.urgency-badge{font-size:9px;letter-spacing:1px;padding:2px 6px;}
+.trend-name{font-size:14px;font-weight:600;margin-bottom:4px;}
+.trend-why{font-size:11px;color:var(--dim);line-height:1.5;}
+.trend-score{font-size:22px;font-weight:700;text-align:right;flex-shrink:0;}
+.trend-expand{display:none;padding-top:14px;margin-top:14px;border-top:1px solid var(--border);}
+.expand-label{font-size:9px;letter-spacing:2px;margin-bottom:8px;}
+.expand-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.expand-field-label{font-size:9px;color:var(--dim);letter-spacing:1px;margin-bottom:3px;}
+.expand-field-val{font-size:11px;color:rgba(240,240,240,0.7);line-height:1.5;}
+@media(max-width:700px){
+  .sidebar{width:100%;height:56px;flex-direction:row;position:fixed;top:0;bottom:auto;border-right:none;border-bottom:1px solid var(--border);}
+  .sidebar-logo{padding:0 16px;display:flex;align-items:center;height:56px;border-bottom:none;}
+  .sidebar-user,.nav-items,.logout-btn{display:none;}
+  .main{margin-left:0;margin-top:56px;padding:20px 16px;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .form-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-title">CFGDROP</div>
+    <div class="login-sub">ADMIN ACCESS ONLY</div>
+    <div class="field">
+      <label>EMAIL</label>
+      <input type="email" id="login-email" placeholder="admin@email.com">
+    </div>
+    <div class="field">
+      <label>PASSWORD</label>
+      <input type="password" id="login-pass" placeholder="••••••••">
+    </div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">ENTER</button>
+    <div class="login-error" id="login-error">Invalid credentials. Try again.</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="sidebar">
+    <div class="sidebar-logo">CFG<span>DROP</span></div>
+    <div class="sidebar-user" id="sidebar-user">—</div>
+    <div class="nav-items">
+      <div class="nav-item active" data-tab="upload" onclick="switchTab('upload')"><span class="nav-icon">↑</span>UPLOAD</div>
+      <div class="nav-item" data-tab="manage" onclick="switchTab('manage')"><span class="nav-icon">≡</span>MANAGE</div>
+      <div class="nav-item" data-tab="trends" onclick="switchTab('trends')"><span class="nav-icon">◈</span>TREND INTEL</div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">⎋ LOGOUT</button>
+  </div>
+
+  <div class="main">
+
+    <!-- UPLOAD -->
+    <div class="panel active" id="tab-upload">
+      <div class="panel-title">UPLOAD CONFIG</div>
+      <div class="panel-sub">ADD A NEW VPN CONFIG FILE TO THE SITE</div>
+      <div class="card">
+        <div class="card-title">CONFIG DETAILS</div>
+        <div class="form-row">
+          <div class="form-group"><label>TITLE</label><input type="text" id="up-title" placeholder="e.g. ZA SSH Premium #1"></div>
+          <div class="form-group">
+            <label>PROTOCOL</label>
+            <select id="up-protocol">
+              <option value="SSH">SSH</option>
+              <option value="VLESS">VLESS</option>
+              <option value="VMess">VMess</option>
+              <option value="SlowDNS">SlowDNS</option>
+              <option value="UDP">UDP</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>SERVER / REGION (optional)</label><input type="text" id="up-server" placeholder="e.g. South Africa · Telkom"></div>
+          <div class="form-group"><label>EXPIRES (optional)</label><input type="text" id="up-expires" placeholder="e.g. 30 Apr 2026"></div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group"><label>DESCRIPTION</label><textarea id="up-desc" rows="3" placeholder="Brief description — compatible apps, network, etc."></textarea></div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label>CONFIG FILE</label>
+            <div class="drop-zone" id="drop-zone">
+              <input type="file" id="file-input" accept=".txt,.ovpn,.conf,.json,.xml,.vmess,.vless">
+              <div class="drop-icon">↑</div>
+              <div class="drop-text">DROP FILE HERE OR CLICK TO BROWSE</div>
+              <div class="drop-sub">TXT · OVPN · CONF · JSON · XML</div>
+              <div class="drop-filename" id="drop-filename"></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="uploadConfig()" id="upload-btn">↑ UPLOAD CONFIG</button>
+        <div class="progress-wrap" id="progress-wrap">
+          <div class="progress-label">UPLOADING...</div>
+          <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        </div>
+        <div class="upload-status" id="upload-status"></div>
+      </div>
+    </div>
+
+    <!-- MANAGE -->
+    <div class="panel" id="tab-manage">
+      <div class="panel-title">MANAGE CONFIGS</div>
+      <div class="panel-sub">VIEW, MONITOR AND DELETE CONFIG FILES</div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-box-num" id="stat-total">—</div><div class="stat-box-label">TOTAL CONFIGS</div></div>
+        <div class="stat-box"><div class="stat-box-num" id="stat-downloads">—</div><div class="stat-box-label">TOTAL DOWNLOADS</div></div>
+        <div class="stat-box"><div class="stat-box-num" id="stat-today">—</div><div class="stat-box-label">ADDED TODAY</div></div>
+        <div class="stat-box"><div class="stat-box-num" id="stat-top">—</div><div class="stat-box-label">TOP DOWNLOADS</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">ALL CONFIGS</div>
+        <div class="config-list" id="config-list"><div style="font-size:11px;color:#333;text-align:center;padding:40px;">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- TREND INTEL -->
+    <div class="panel" id="tab-trends">
+      <div class="panel-title">TREND INTEL</div>
+      <div class="panel-sub">NDS MORNING BRIEF — EARLY SIGNAL DETECTION</div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <button onclick="filterTrends('All')" class="btn btn-sm btn-primary" data-tf="All">ALL</button>
+        <button onclick="filterTrends('Tech')" class="btn btn-sm" data-tf="Tech" style="background:transparent;border:1px solid var(--border2);color:var(--dim);">TECH</button>
+        <button onclick="filterTrends('Culture')" class="btn btn-sm" data-tf="Culture" style="background:transparent;border:1px solid var(--border2);color:var(--dim);">CULTURE</button>
+        <button onclick="filterTrends('Music')" class="btn btn-sm" data-tf="Music" style="background:transparent;border:1px solid var(--border2);color:var(--dim);">MUSIC</button>
+        <button onclick="filterTrends('Finance')" class="btn btn-sm" data-tf="Finance" style="background:transparent;border:1px solid var(--border2);color:var(--dim);">FINANCE</button>
+        <button onclick="filterTrends('Forex')" class="btn btn-sm" data-tf="Forex" style="background:transparent;border:1px solid var(--border2);color:var(--dim);">FOREX</button>
+      </div>
+      <button class="scan-btn" id="scan-btn" onclick="runBrief()">▶ RUN MORNING BRIEF</button>
+      <div class="scan-log" id="scan-log"></div>
+      <div id="trend-results"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://lkruzhkjultgappbhwvq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxrcnV6aGtqdWx0Z2FwcGJod3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2Nzg3MTQsImV4cCI6MjA5MTI1NDcxNH0.qSxwE01YLfjG28jV7YKJQsiM1HIar9JCOaJKvmMhfq0';
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── AUTH ──
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const btn = document.getElementById('login-btn');
+  const errEl = document.getElementById('login-error');
+  if (!email || !pass) { errEl.style.display='block'; errEl.textContent='Fill in all fields.'; return; }
+  btn.disabled = true; btn.textContent = 'VERIFYING...'; errEl.style.display = 'none';
+  const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    errEl.style.display = 'block'; errEl.textContent = 'Access denied.';
+    btn.disabled = false; btn.textContent = 'ENTER'; return;
+  }
+  document.getElementById('sidebar-user').textContent = email;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadManage();
+}
+
+async function doLogout() { await db.auth.signOut(); location.reload(); }
+
+(async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (session) {
+    document.getElementById('sidebar-user').textContent = session.user.email;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadManage();
+  }
+})();
+
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// ── TABS ──
+function switchTab(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  if (tab === 'manage') loadManage();
+}
+
+// ── FILE INPUT ──
+const fileInput = document.getElementById('file-input');
+const dropZone = document.getElementById('drop-zone');
+const dropFilename = document.getElementById('drop-filename');
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) { dropFilename.textContent = '✓ ' + fileInput.files[0].name; dropFilename.style.display = 'block'; }
+});
+['dragover','dragenter'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('drag'); }));
+['dragleave','drop'].forEach(e => dropZone.addEventListener(e, () => dropZone.classList.remove('drag')));
+
+// ── UPLOAD ──
+async function uploadConfig() {
+  const title = document.getElementById('up-title').value.trim();
+  const protocol = document.getElementById('up-protocol').value;
+  const desc = document.getElementById('up-desc').value.trim();
+  const server = document.getElementById('up-server').value.trim();
+  const expires = document.getElementById('up-expires').value.trim();
+  const file = fileInput.files[0];
+  const statusEl = document.getElementById('upload-status');
+  const progressWrap = document.getElementById('progress-wrap');
+  const progressFill = document.getElementById('progress-fill');
+  const uploadBtn = document.getElementById('upload-btn');
+
+  if (!title || !file) {
+    statusEl.style.display = 'block'; statusEl.style.color = 'var(--red)';
+    statusEl.textContent = '✗ Title and file are required.'; return;
+  }
+
+  uploadBtn.disabled = true; progressWrap.style.display = 'block'; statusEl.style.display = 'none';
+  let prog = 0;
+  const progInterval = setInterval(() => { prog = Math.min(prog + Math.random() * 15, 85); progressFill.style.width = prog + '%'; }, 200);
+
+  const filename = `${Date.now()}-${file.name.replace(/\s+/g,'-')}`;
+  const { data: fileData, error: fileError } = await db.storage.from('configs').upload(filename, file, { cacheControl: '3600', upsert: false });
+
+  clearInterval(progInterval);
+
+  if (fileError) {
+    progressFill.style.width = '0%'; progressWrap.style.display = 'none';
+    statusEl.style.display = 'block'; statusEl.style.color = 'var(--red)';
+    statusEl.textContent = '✗ Upload failed: ' + fileError.message;
+    uploadBtn.disabled = false; return;
+  }
+
+  progressFill.style.width = '95%';
+  const { data: urlData } = db.storage.from('configs').getPublicUrl(fileData.path);
+  const { error: dbError } = await db.from('configs').insert({
+    title, protocol, description: desc,
+    server: server || null, expires: expires || null,
+    file_url: urlData.publicUrl, file_path: fileData.path, downloads: 0,
+  });
+
+  progressFill.style.width = '100%';
+  statusEl.style.display = 'block';
+  if (dbError) {
+    statusEl.style.color = 'var(--red)'; statusEl.textContent = '✗ DB error: ' + dbError.message;
+  } else {
+    statusEl.style.color = 'var(--green)'; statusEl.textContent = '✓ Config uploaded successfully!';
+    document.getElementById('up-title').value = '';
+    document.getElementById('up-desc').value = '';
+    document.getElementById('up-server').value = '';
+    document.getElementById('up-expires').value = '';
+    fileInput.value = ''; dropFilename.style.display = 'none';
+    setTimeout(() => { progressWrap.style.display = 'none'; progressFill.style.width = '0%'; }, 1500);
+  }
+  uploadBtn.disabled = false;
+}
+
+// ── MANAGE ──
+let allConfigs = [];
+async function loadManage() {
+  const list = document.getElementById('config-list');
+  list.innerHTML = '<div style="font-size:11px;color:#333;text-align:center;padding:40px;">Loading...</div>';
+  const { data, error } = await db.from('configs').select('*').order('created_at', { ascending: false });
+  if (error || !data) { list.innerHTML = '<div style="font-size:11px;color:#333;text-align:center;padding:40px;">Failed to load.</div>'; return; }
+  allConfigs = data;
+  const totalDl = data.reduce((s, c) => s + (c.downloads || 0), 0);
+  const topDl = data.length ? Math.max(...data.map(c => c.downloads || 0)) : 0;
+  const today = new Date().toDateString();
+  const addedToday = data.filter(c => new Date(c.created_at).toDateString() === today).length;
+  document.getElementById('stat-total').textContent = data.length;
+  document.getElementById('stat-downloads').textContent = totalDl > 999 ? (totalDl/1000).toFixed(1)+'K' : totalDl;
+  document.getElementById('stat-today').textContent = addedToday;
+  document.getElementById('stat-top').textContent = topDl;
+  if (!data.length) { list.innerHTML = '<div style="font-size:11px;color:#333;text-align:center;padding:40px;">No configs yet. Upload one above.</div>'; return; }
+  list.innerHTML = data.map(cfg => {
+    const date = new Date(cfg.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    return `<div class="config-item">
+      <span class="config-item-badge">${cfg.protocol||'CFG'}</span>
+      <div class="config-item-info">
+        <div class="config-item-title">${cfg.title}</div>
+        <div class="config-item-meta">${date}${cfg.server?' · '+cfg.server:''}</div>
+      </div>
+      <div class="config-item-dl">↓ ${(cfg.downloads||0).toLocaleString()}</div>
+      <button class="btn btn-danger btn-sm" onclick="deleteConfig('${cfg.id}','${cfg.file_path}')">DELETE</button>
+    </div>`;
+  }).join('');
+}
+
+async function deleteConfig(id, filePath) {
+  if (!confirm('Delete this config? Cannot be undone.')) return;
+  await db.storage.from('configs').remove([filePath]);
+  await db.from('configs').delete().eq('id', id);
+  loadManage();
+}
+
+// ── TREND INTEL ──
+const NORTH_CONTEXT = `You are the content intelligence system for North — a young South African creator, entrepreneur, forex trader, and music producer building the NDS (North Dream Studio) brand. Niches: forex, music production, startups/apps, street culture, fashion, South African culture, cinematic storytelling, entrepreneurship. YouTube growth is #1 priority in 2026.`;
+const SUBREDDITS = ['streetwear','sneakers','hiphopheads','artificial','startups','SideProject','MachineLearning','Daytrading','Forex','entrepreneur','WeAreTheMusicMakers','makinghiphop','OutOfTheLoop','InternetIsBeautiful','futurology','TikTokCringe'];
+const NEWS_FEEDS = [
+  {name:'TechCrunch',url:'https://techcrunch.com/feed/'},
+  {name:'Rolling Stone',url:'https://www.rollingstone.com/feed/'},
+  {name:'Hypebeast',url:'https://hypebeast.com/feed'},
+  {name:'The Verge',url:'https://www.theverge.com/rss/index.xml'},
+  {name:'BBC Tech',url:'https://feeds.bbci.co.uk/news/technology/rss.xml'},
+];
+const PROXY = 'https://api.allorigins.win/get?url=';
+let scanRunning = false;
+let allTrends = [];
+
+async function fetchReddit(sub) {
+  try {
+    const res = await fetch(`${PROXY}${encodeURIComponent(`https://www.reddit.com/r/${sub}/rising.json?limit=10&raw_json=1`)}`);
+    const json = await res.json();
+    const data = JSON.parse(json.contents);
+    return (data?.data?.children||[]).map(p=>({title:p.data.title,score:p.data.score,source:`Reddit r/${sub}`,type:'reddit'}));
+  } catch { return []; }
+}
+async function fetchHN() {
+  try {
+    const res = await fetch(`${PROXY}${encodeURIComponent('https://hacker-news.firebaseio.com/v0/newstories.json')}`);
+    const json = await res.json();
+    const ids = JSON.parse(json.contents).slice(0,20);
+    const stories = await Promise.all(ids.slice(0,10).map(id=>fetch(`${PROXY}${encodeURIComponent(`https://hacker-news.firebaseio.com/v0/item/${id}.json`)}`).then(r=>r.json()).then(j=>JSON.parse(j.contents)).catch(()=>null)));
+    return stories.filter(Boolean).filter(s=>s?.title).map(s=>({title:s.title,score:s.score||0,source:'HackerNews',type:'hn'}));
+  } catch { return []; }
+}
+async function fetchYouTube() {
+  try {
+    const res = await fetch(`${PROXY}${encodeURIComponent('https://www.youtube.com/feeds/videos.xml?chart=mostpopular&regionCode=US')}`);
+    const json = await res.json();
+    const xml = new DOMParser().parseFromString(json.contents,'text/xml');
+    return Array.from(xml.querySelectorAll('entry')).slice(0,15).map(e=>({title:e.querySelector('title')?.textContent||'',source:'YouTube Trending',type:'youtube'}));
+  } catch { return []; }
+}
+async function fetchNews(feed) {
+  try {
+    const res = await fetch(`${PROXY}${encodeURIComponent(feed.url)}`);
+    const json = await res.json();
+    const xml = new DOMParser().parseFromString(json.contents,'text/xml');
+    return Array.from(xml.querySelectorAll('item')).slice(0,8).map(item=>({title:item.querySelector('title')?.textContent||'',source:feed.name,type:'news'}));
+  } catch { return []; }
+}
+
+function addLog(msg) {
+  const log = document.getElementById('scan-log');
+  log.style.display = 'block';
+  log.innerHTML += `<div style="color:${msg.startsWith('✓')?'var(--green)':msg.startsWith('✗')?'var(--red)':'var(--dim)'}">${msg}</div>`;
+  log.scrollTop = log.scrollHeight;
+}
+
+async function runBrief() {
+  if (scanRunning) return;
+  scanRunning = true;
+  const btn = document.getElementById('scan-btn');
+  btn.disabled = true; btn.textContent = 'SCANNING...';
+  document.getElementById('scan-log').innerHTML = '';
+  document.getElementById('trend-results').innerHTML = '';
+  allTrends = [];
+  let signals = [];
+
+  addLog('→ Scanning Reddit rising...');
+  for (const sub of SUBREDDITS.slice(0,10)) {
+    const posts = await fetchReddit(sub);
+    signals = [...signals,...posts];
+    if (posts.length) addLog(`  ✓ r/${sub} (${posts.length})`);
+  }
+  addLog('→ Scanning HackerNews...');
+  const hn = await fetchHN(); signals = [...signals,...hn];
+  addLog(`  ✓ HackerNews (${hn.length})`);
+  addLog('→ Scanning YouTube...');
+  const yt = await fetchYouTube(); signals = [...signals,...yt];
+  addLog(`  ✓ YouTube (${yt.length})`);
+  addLog('→ Scanning news feeds...');
+  for (const feed of NEWS_FEEDS) { const a = await fetchNews(feed); signals=[...signals,...a]; if(a.length) addLog(`  ✓ ${feed.name} (${a.length})`); }
+  addLog(`→ ${signals.length} signals — running AI...`);
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`${NORTH_CONTEXT}\n\nRaw signals:\n${JSON.stringify(signals.slice(0,60),null,2)}\n\nIdentify TOP 8 pre-mainstream trends. Return ONLY a valid JSON array, no markdown:\n[{"trend_name":"...","category":"Tech|Culture|Music|Fashion|Finance|Forex","velocity_score":75,"urgency":"Post today|This week|Within 2 weeks","why_rising":"...","mainstream_eta":"...","sources_detected":["..."],"youtube_angle":{"format":"Short|Long-form|Both","title":"...","hook":"...","why_now":"..."},"tiktok_hook":"...","instagram_angle":"..."}]\n\nYouTube growth is #1. Sort by urgency then velocity. Return exactly 8.`}]})});
+    const data = await res.json();
+    const text = data.content?.map(b=>b.text||'').join('')||'';
+    allTrends = JSON.parse(text.replace(/```json|```/g,'').trim());
+    renderTrends(allTrends);
+    addLog(`✓ Brief complete — ${allTrends.length} trends`);
+  } catch(e) { addLog('✗ AI analysis failed — retry'); }
+
+  btn.disabled = false; btn.textContent = '▶ RUN MORNING BRIEF';
+  scanRunning = false;
+}
+
+function filterTrends(cat) {
+  document.querySelectorAll('[data-tf]').forEach(b => {
+    b.style.background = b.dataset.tf===cat?'var(--cyan)':'transparent';
+    b.style.color = b.dataset.tf===cat?'#000':'var(--dim)';
+    b.style.border = b.dataset.tf===cat?'none':'1px solid var(--border2)';
+  });
+  renderTrends(cat==='All'?allTrends:allTrends.filter(t=>t.category===cat));
+}
+
+function urgencyColor(u){return u==='Post today'?'var(--red)':u==='This week'?'var(--orange)':'var(--yellow)';}
+
+function renderTrends(trends) {
+  const el = document.getElementById('trend-results');
+  if (!trends.length){el.innerHTML='<div style="font-size:11px;color:#333;text-align:center;padding:40px;">No trends for this filter.</div>';return;}
+  el.innerHTML = trends.map((t,i)=>{
+    const uc=urgencyColor(t.urgency);
+    return `<div class="trend-card" style="border-left-color:${uc}" onclick="toggleExpand(${i})">
+      <div class="trend-top">
+        <div style="flex:1">
+          <div class="trend-badges">
+            <span class="urgency-badge" style="background:${uc}20;color:${uc};border:1px solid ${uc}40">${(t.urgency||'').toUpperCase()}</span>
+            <span style="font-size:9px;color:var(--dim);letter-spacing:1px">${(t.category||'').toUpperCase()}</span>
+            <span style="font-size:9px;color:var(--muted)">ETA: ${t.mainstream_eta}</span>
+          </div>
+          <div class="trend-name">${t.trend_name}</div>
+          <div class="trend-why">${t.why_rising}</div>
+        </div>
+        <div><div class="trend-score" style="color:${uc}">${t.velocity_score}</div><div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-align:right">VEL</div></div>
+      </div>
+      <div class="trend-expand" id="trend-expand-${i}">
+        <div style="margin-bottom:14px">
+          <div class="expand-label" style="color:var(--yellow)">▶ YOUTUBE ANGLE</div>
+          <div class="expand-grid">
+            <div><div class="expand-field-label">TITLE</div><div class="expand-field-val" style="color:#fff;font-weight:500">${t.youtube_angle?.title||'—'}</div></div>
+            <div><div class="expand-field-label">FORMAT</div><div class="expand-field-val">${t.youtube_angle?.format||'—'}</div></div>
+            <div style="grid-column:1/-1"><div class="expand-field-label">HOOK</div><div class="expand-field-val">${t.youtube_angle?.hook||'—'}</div></div>
+            <div style="grid-column:1/-1"><div class="expand-field-label">WHY NOW</div><div class="expand-field-val">${t.youtube_angle?.why_now||'—'}</div></div>
+          </div>
+        </div>
+        <div class="expand-grid">
+          <div><div class="expand-label" style="color:var(--dim)">◈ TIKTOK</div><div class="expand-field-val">${t.tiktok_hook||'—'}</div></div>
+          <div><div class="expand-label" style="color:var(--dim)">◉ INSTAGRAM</div><div class="expand-field-val">${t.instagram_angle||'—'}</div></div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">${(t.sources_detected||[]).map(s=>`<span style="font-size:9px;color:var(--muted);border:1px solid var(--border);padding:2px 6px">${s}</span>`).join('')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleExpand(i){const el=document.getElementById(`trend-expand-${i}`);if(!el)return;const isOpen=el.style.display==='block';document.querySelectorAll('.trend-expand').forEach(e=>e.style.display='none');if(!isOpen)el.style.display='block';}
+</script>
+</body>
+</html>
