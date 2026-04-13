@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CFGDROP — Free VPN Configs</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- ADSTERRA_HEAD_START --><!-- ADSTERRA_HEAD_END -->
+<!-- MONETAG_HEAD_START --><!-- MONETAG_HEAD_END -->
+<!-- HILLTOPADS_HEAD_START --><!-- HILLTOPADS_HEAD_END -->
+<style>
+:root {
+  --bg: #030303;--s1: #0a0a0a;--s2: #111;--border: #1a1a1a;--border2: #242424;
+  --cyan: #00e5ff;--green: #00ff87;--yellow: #ffe600;--red: #ff3b3b;
+  --text: #f0f0f0;--muted: #3a3a3a;--dim: #666;
+  --font-d: 'Orbitron', sans-serif;--font-b: 'JetBrains Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);min-height:100vh;overflow-x:hidden;position:relative;}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 20px;}
+header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdrop-filter:blur(10px);position:sticky;top:0;z-index:100;}
+.header-inner{max-width:900px;margin:0 auto;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-family:var(--font-d);font-size:18px;font-weight:900;letter-spacing:4px;color:var(--cyan);text-shadow:0 0 20px rgba(0,229,255,0.4);}
+.logo span{color:var(--text);}
+.status-pill{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--dim);letter-spacing:1px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.ad-banner-top{background:var(--s1);border-bottom:1px solid var(--border);min-height:90px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.ad-label{position:absolute;top:4px;left:8px;font-size:8px;color:var(--muted);letter-spacing:1px;}
+.hero{padding:48px 0 32px;text-align:center;animation:fadeUp 0.6s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.hero-title{font-family:var(--font-d);font-size:clamp(24px,5vw,40px);font-weight:900;letter-spacing:3px;line-height:1.1;margin-bottom:12px;}
+.hero-title .highlight{color:var(--cyan);}
+.hero-sub{font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:24px;}
+.stats-row{display:inline-flex;gap:32px;padding:10px 24px;border:1px solid var(--border);background:var(--s1);}
+.stat{text-align:center;}
+.stat-num{font-size:20px;font-weight:500;color:var(--cyan);}
+.stat-label{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
+.filters{display:flex;gap:8px;flex-wrap:wrap;padding:20px 0 16px;animation:fadeUp 0.6s 0.1s ease both;}
+.filter-btn{padding:6px 14px;font-family:var(--font-b);font-size:10px;letter-spacing:1px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--dim);transition:all 0.15s;}
+.filter-btn:hover,.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,0.05);}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:10px;padding-bottom:40px;}
+.config-card{background:var(--s1);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden;transition:border-color 0.2s,transform 0.2s;animation:fadeUp 0.5s ease both;}
+.config-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:opacity 0.2s;}
+.config-card:hover{border-color:var(--border2);transform:translateY(-1px);}
+.config-card:hover::before{opacity:1;}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.protocol-badge{font-size:9px;letter-spacing:2px;padding:3px 8px;border:1px solid rgba(0,229,255,0.3);color:var(--cyan);background:rgba(0,229,255,0.06);}
+.dl-count{font-size:10px;color:var(--dim);display:flex;align-items:center;gap:4px;}
+.card-title{font-family:var(--font-d);font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:8px;line-height:1.3;}
+.card-desc{font-size:11px;color:var(--dim);line-height:1.6;margin-bottom:16px;}
+.card-meta{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.meta-tag{font-size:9px;color:var(--muted);letter-spacing:1px;padding:2px 6px;border:1px solid var(--border2);}
+.dl-btn{width:100%;padding:11px;font-family:var(--font-d);font-size:11px;letter-spacing:2px;font-weight:700;cursor:pointer;background:var(--cyan);color:#000;border:none;transition:all 0.15s;position:relative;overflow:hidden;}
+.dl-btn:hover{background:#fff;box-shadow:0 0 20px rgba(0,229,255,0.3);}
+.dl-btn:active{transform:scale(0.98);}
+.loading{text-align:center;padding:80px 0;color:var(--dim);font-size:11px;letter-spacing:2px;}
+.loading-dot{display:inline-block;animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+.empty{text-align:center;padding:80px 0;color:var(--muted);}
+.empty-title{font-family:var(--font-d);font-size:16px;letter-spacing:3px;margin-bottom:8px;}
+.ad-mid{background:var(--s1);border:1px solid var(--border);border-left:2px solid var(--border2);min-height:100px;display:flex;align-items:center;justify-content:center;margin:8px 0;position:relative;}
+footer{border-top:1px solid var(--border);padding:24px 0;text-align:center;font-size:10px;color:var(--muted);letter-spacing:1px;line-height:1.8;position:relative;z-index:1;}
+.ad-sticky{position:fixed;bottom:0;left:0;right:0;background:rgba(3,3,3,0.97);border-top:1px solid var(--border2);min-height:60px;display:flex;align-items:center;justify-content:center;z-index:200;padding:4px 0;}
+.ad-close{position:absolute;top:4px;right:8px;font-size:11px;color:var(--muted);cursor:pointer;background:none;border:none;font-family:var(--font-b);}
+.interstitial{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:1000;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;}
+.interstitial.active{display:flex;}
+.inter-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
+.inter-title{font-family:var(--font-d);font-size:11px;letter-spacing:4px;color:var(--dim);margin-bottom:32px;}
+.inter-title span{color:var(--cyan);}
+.countdown-wrap{position:relative;width:100px;height:100px;margin-bottom:32px;}
+.countdown-svg{position:absolute;inset:0;transform:rotate(-90deg);}
+.countdown-track{fill:none;stroke:var(--border2);stroke-width:3;}
+.countdown-prog{fill:none;stroke:var(--cyan);stroke-width:3;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;filter:drop-shadow(0 0 4px var(--cyan));}
+.countdown-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--cyan);}
+.inter-status{font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:32px;height:16px;}
+.inter-ad{width:100%;max-width:728px;min-height:90px;background:var(--s1);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:24px;position:relative;}
+.dl-ready-btn{display:none;padding:14px 40px;font-family:var(--font-d);font-size:13px;letter-spacing:3px;font-weight:700;cursor:pointer;background:var(--green);color:#000;border:none;animation:glowPulse 1s infinite alternate;}
+@keyframes glowPulse{from{box-shadow:0 0 10px rgba(0,255,135,0.3);}to{box-shadow:0 0 30px rgba(0,255,135,0.7);}}
+.inter-skip{margin-top:16px;font-size:10px;color:var(--muted);letter-spacing:1px;cursor:default;}
+@media(max-width:600px){.grid{grid-template-columns:1fr;}.stats-row{gap:20px;}.hero-title{font-size:22px;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">CFG<span>DROP</span></div>
+    <div class="status-pill"><div class="dot"></div><span>CONFIGS LIVE</span></div>
+  </div>
+</header>
+
+<div class="ad-banner-top">
+  <div class="ad-label">ADVERTISEMENT</div>
+  <!-- AD_TOP_BANNER_START -->
+  <div style="color:#1f1f1f;font-size:10px;letter-spacing:2px;">AD SPACE · 728×90</div>
+  <!-- AD_TOP_BANNER_END -->
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-title">FREE <span class="highlight">VPN CONFIGS</span><br>UPDATED DAILY</div>
+    <div class="hero-sub">SSH · VLESS · VMess · SlowDNS · UDP Custom — No signup. No limits.</div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-num" id="total-configs">—</div><div class="stat-label">CONFIGS</div></div>
+      <div class="stat"><div class="stat-num" id="total-downloads">—</div><div class="stat-label">DOWNLOADS</div></div>
+      <div class="stat"><div class="stat-num">FREE</div><div class="stat-label">ALWAYS</div></div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all">ALL</button>
+    <button class="filter-btn" data-filter="SSH">SSH</button>
+    <button class="filter-btn" data-filter="VLESS">VLESS</button>
+    <button class="filter-btn" data-filter="VMess">VMess</button>
+    <button class="filter-btn" data-filter="SlowDNS">SlowDNS</button>
+    <button class="filter-btn" data-filter="UDP">UDP</button>
+  </div>
+
+  <div id="config-grid" class="grid">
+    <div class="loading">LOADING CONFIGS<span class="loading-dot">...</span></div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    CFGDROP · FREE VPN CONFIGS<br>
+    <span style="color:#222;">Configs are provided for educational purposes. Use responsibly.</span>
+  </div>
+</footer>
+
+<div class="ad-sticky" id="sticky-ad">
+  <button class="ad-close" onclick="document.getElementById('sticky-ad').style.display='none'">✕</button>
+  <!-- AD_STICKY_START -->
+  <div style="color:#1f1f1f;font-size:10px;letter-spacing:2px;">AD SPACE · STICKY BOTTOM</div>
+  <!-- AD_STICKY_END -->
+</div>
+
+<div class="interstitial" id="interstitial">
+  <div class="inter-grid"></div>
+  <div class="inter-title">CFGDROP · <span>SECURE DOWNLOAD</span></div>
+  <div class="countdown-wrap">
+    <svg class="countdown-svg" viewBox="0 0 100 100">
+      <circle class="countdown-track" cx="50" cy="50" r="45"/>
+      <circle class="countdown-prog" id="countdown-prog" cx="50" cy="50" r="45"/>
+    </svg>
+    <div class="countdown-num" id="countdown-num">10</div>
+  </div>
+  <div class="inter-status" id="inter-status">PREPARING YOUR CONFIG...</div>
+  <div class="inter-ad">
+    <!-- AD_INTERSTITIAL_START -->
+    <div style="color:#1f1f1f;font-size:10px;letter-spacing:2px;">AD SPACE · INTERSTITIAL</div>
+    <!-- AD_INTERSTITIAL_END -->
+  </div>
+  <button class="dl-ready-btn" id="dl-ready-btn">↓ DOWNLOAD CONFIG</button>
+  <div class="inter-skip" id="inter-skip">Please wait <span id="skip-num">10</span>s...</div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://lkruzhkjultgappbhwvq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxrcnV6aGtqdWx0Z2FwcGJod3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2Nzg3MTQsImV4cCI6MjA5MTI1NDcxNH0.qSxwE01YLfjG28jV7YKJQsiM1HIar9JCOaJKvmMhfq0';
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let allConfigs = [];
+let currentDownload = null;
+let countdownInterval = null;
+
+async function loadConfigs() {
+  const grid = document.getElementById('config-grid');
+  const { data, error } = await db.from('configs').select('*').order('created_at', { ascending: false });
+  if (error || !data) {
+    grid.innerHTML = `<div class="empty"><div class="empty-title">NO CONFIGS</div><div style="font-size:11px;color:#333;margin-top:8px;">Check back soon.</div></div>`;
+    return;
+  }
+  allConfigs = data;
+  updateStats();
+  renderGrid(data);
+}
+
+function updateStats() {
+  const totalDl = allConfigs.reduce((sum, c) => sum + (c.downloads || 0), 0);
+  document.getElementById('total-configs').textContent = allConfigs.length;
+  document.getElementById('total-downloads').textContent = totalDl > 999 ? (totalDl/1000).toFixed(1)+'K' : totalDl;
+}
+
+function renderGrid(configs) {
+  const grid = document.getElementById('config-grid');
+  if (!configs.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-title">NO CONFIGS</div><div style="font-size:11px;color:#333;margin-top:8px;">Nothing here yet.</div></div>`;
+    return;
+  }
+  let html = '';
+  configs.forEach((cfg, i) => {
+    if (i > 0 && i % 4 === 0) {
+      html += `<div class="ad-mid" style="grid-column:1/-1"><div class="ad-label">ADVERTISEMENT</div><div style="color:#1a1a1a;font-size:10px;letter-spacing:2px;">AD SPACE · MID CONTENT</div></div>`;
+    }
+    const dlCount = cfg.downloads || 0;
+    const protocol = cfg.protocol || 'CONFIG';
+    const added = new Date(cfg.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short'});
+    html += `
+      <div class="config-card" style="animation-delay:${i*0.05}s">
+        <div class="card-top">
+          <span class="protocol-badge">${protocol}</span>
+          <span class="dl-count">↓ ${dlCount.toLocaleString()}</span>
+        </div>
+        <div class="card-title">${cfg.title}</div>
+        <div class="card-desc">${cfg.description || 'No description provided.'}</div>
+        <div class="card-meta">
+          <span class="meta-tag">${added}</span>
+          ${cfg.server ? `<span class="meta-tag">${cfg.server}</span>` : ''}
+          ${cfg.expires ? `<span class="meta-tag">EXP: ${cfg.expires}</span>` : ''}
+        </div>
+        <button class="dl-btn" onclick="startDownload('${cfg.id}', '${cfg.file_url}', '${cfg.title}')">↓ DOWNLOAD</button>
+      </div>`;
+  });
+  grid.innerHTML = html;
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const f = btn.dataset.filter;
+    renderGrid(f === 'all' ? allConfigs : allConfigs.filter(c => c.protocol === f));
+  });
+});
+
+function startDownload(id, fileUrl, title) {
+  currentDownload = { id, fileUrl, title };
+  document.getElementById('interstitial').classList.add('active');
+  runCountdown(10);
+}
+
+function runCountdown(seconds) {
+  const numEl = document.getElementById('countdown-num');
+  const progEl = document.getElementById('countdown-prog');
+  const statusEl = document.getElementById('inter-status');
+  const skipEl = document.getElementById('inter-skip');
+  const skipNum = document.getElementById('skip-num');
+  const dlBtn = document.getElementById('dl-ready-btn');
+  const circumference = 283;
+  let remaining = seconds;
+  const statuses = ['PREPARING YOUR CONFIG...','VERIFYING FILE INTEGRITY...','ESTABLISHING CONNECTION...','ALMOST READY...'];
+  dlBtn.style.display = 'none';
+  skipEl.style.display = 'block';
+  numEl.textContent = remaining;
+  numEl.style.fontSize = '28px';
+  progEl.style.strokeDashoffset = 0;
+  progEl.style.stroke = 'var(--cyan)';
+  if (countdownInterval) clearInterval(countdownInterval);
+  countdownInterval = setInterval(() => {
+    remaining--;
+    numEl.textContent = remaining;
+    skipNum.textContent = remaining;
+    progEl.style.strokeDashoffset = circumference * (1 - remaining / seconds);
+    statusEl.textContent = statuses[Math.min(Math.floor((seconds - remaining) / (seconds / statuses.length)), statuses.length - 1)];
+    if (remaining <= 0) {
+      clearInterval(countdownInterval);
+      statusEl.textContent = 'YOUR CONFIG IS READY ✓';
+      numEl.textContent = '✓';
+      numEl.style.fontSize = '20px';
+      progEl.style.stroke = 'var(--green)';
+      skipEl.style.display = 'none';
+      dlBtn.style.display = 'block';
+      triggerDownload();
+      incrementDownloads(currentDownload.id);
+    }
+  }, 1000);
+}
+
+function triggerDownload() {
+  if (!currentDownload?.fileUrl) return;
+  const a = document.createElement('a');
+  a.href = currentDownload.fileUrl;
+  a.download = currentDownload.title || 'config';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+document.getElementById('dl-ready-btn').addEventListener('click', () => { triggerDownload(); closeInterstitial(); });
+
+function closeInterstitial() {
+  document.getElementById('interstitial').classList.remove('active');
+  if (countdownInterval) clearInterval(countdownInterval);
+  currentDownload = null;
+}
+
+document.getElementById('interstitial').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('interstitial') && document.getElementById('dl-ready-btn').style.display === 'block') closeInterstitial();
+});
+
+async function incrementDownloads(id) {
+  const config = allConfigs.find(c => c.id === id);
+  if (!config) return;
+  const newCount = (config.downloads || 0) + 1;
+  await db.from('configs').update({ downloads: newCount }).eq('id', id);
+  config.downloads = newCount;
+  updateStats();
+}
+
+loadConfigs();
+</script>
+</body>
+</html>
