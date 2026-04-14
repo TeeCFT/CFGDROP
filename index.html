@@ -5,26 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CFGDROP — Free VPN Configs</title>
 
-<!-- ── VERIFICATION TAGS ── -->
+<!-- Verification -->
 <meta name="referrer" content="no-referrer-when-downgrade" />
 <meta name="monetag" content="ffcb76681868a71efeb18a668b32735c">
 
-<!-- ── MONETAG HEAD SCRIPT (paste below after verification) ── -->
-<!-- MONETAG_HEAD_START -->
-<!-- MONETAG_HEAD_END -->
-
-<!-- ── HILLTOPADS HEAD SCRIPT (paste below after verification) ── -->
-<!-- HILLTOPADS_HEAD_START -->
-<!-- HILLTOPADS_HEAD_END -->
+<!-- Monetag Popunder — fires on page load -->
+<script>(function(s){s.dataset.zone='10873102',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
-  --bg: #030303;--s1: #0a0a0a;--s2: #111;--border: #1a1a1a;--border2: #242424;
-  --cyan: #00e5ff;--green: #00ff87;--yellow: #ffe600;--red: #ff3b3b;
-  --text: #f0f0f0;--muted: #3a3a3a;--dim: #666;
-  --font-d: 'Orbitron', sans-serif;--font-b: 'JetBrains Mono', monospace;
+  --bg:#030303;--s1:#0a0a0a;--s2:#111;--border:#1a1a1a;--border2:#242424;
+  --cyan:#00e5ff;--green:#00ff87;--yellow:#ffe600;--red:#ff3b3b;
+  --text:#f0f0f0;--muted:#3a3a3a;--dim:#666;
+  --font-d:'Orbitron',sans-serif;--font-b:'JetBrains Mono',monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:var(--font-b);min-height:100vh;overflow-x:hidden;position:relative;}
@@ -37,8 +32,16 @@ header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdro
 .status-pill{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--dim);letter-spacing:1px;}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
-.ad-banner-top{background:var(--s1);border-bottom:1px solid var(--border);min-height:90px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+
+/* ── TOP BANNER ── */
+.ad-top-wrap{
+  width:100%;display:flex;align-items:center;justify-content:center;
+  padding:10px 0;background:var(--s1);border-bottom:1px solid var(--border);
+  min-height:110px;position:relative;
+}
 .ad-label{position:absolute;top:4px;left:8px;font-size:8px;color:var(--muted);letter-spacing:1px;}
+
+/* ── HERO ── */
 .hero{padding:48px 0 32px;text-align:center;animation:fadeUp 0.6s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 .hero-title{font-family:var(--font-d);font-size:clamp(24px,5vw,40px);font-weight:900;letter-spacing:3px;line-height:1.1;margin-bottom:12px;}
@@ -48,10 +51,14 @@ header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdro
 .stat{text-align:center;}
 .stat-num{font-size:20px;font-weight:500;color:var(--cyan);}
 .stat-label{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
-.filters{display:flex;gap:8px;flex-wrap:wrap;padding:20px 0 16px;animation:fadeUp 0.6s 0.1s ease both;}
+
+/* ── FILTERS ── */
+.filters{display:flex;gap:8px;flex-wrap:wrap;padding:20px 0 16px;}
 .filter-btn{padding:6px 14px;font-family:var(--font-b);font-size:10px;letter-spacing:1px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--dim);transition:all 0.15s;}
 .filter-btn:hover,.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,0.05);}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:10px;padding-bottom:40px;}
+
+/* ── GRID ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:10px;padding-bottom:100px;}
 .config-card{background:var(--s1);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden;transition:border-color 0.2s,transform 0.2s;animation:fadeUp 0.5s ease both;}
 .config-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:opacity 0.2s;}
 .config-card:hover{border-color:var(--border2);transform:translateY(-1px);}
@@ -66,15 +73,26 @@ header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdro
 .dl-btn{width:100%;padding:11px;font-family:var(--font-d);font-size:11px;letter-spacing:2px;font-weight:700;cursor:pointer;background:var(--cyan);color:#000;border:none;transition:all 0.15s;}
 .dl-btn:hover{background:#fff;box-shadow:0 0 20px rgba(0,229,255,0.3);}
 .dl-btn:active{transform:scale(0.98);}
+
+/* ── MID AD (300x250) ── */
+.ad-mid-wrap{
+  grid-column:1/-1;
+  display:flex;align-items:center;justify-content:center;
+  padding:16px 0;position:relative;
+}
+.ad-mid-wrap .ad-label{top:4px;}
+
+/* ── LOADING / EMPTY ── */
 .loading{text-align:center;padding:80px 0;color:var(--dim);font-size:11px;letter-spacing:2px;}
 .loading-dot{display:inline-block;animation:blink 1s infinite;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
 .empty{text-align:center;padding:80px 0;color:var(--muted);}
 .empty-title{font-family:var(--font-d);font-size:16px;letter-spacing:3px;margin-bottom:8px;}
-.ad-mid{background:var(--s1);border:1px solid var(--border);border-left:2px solid var(--border2);min-height:100px;display:flex;align-items:center;justify-content:center;margin:8px 0;position:relative;}
-footer{border-top:1px solid var(--border);padding:24px 0;text-align:center;font-size:10px;color:var(--muted);letter-spacing:1px;line-height:1.8;position:relative;z-index:1;}
-.ad-sticky{position:fixed;bottom:0;left:0;right:0;background:rgba(3,3,3,0.97);border-top:1px solid var(--border2);min-height:60px;display:flex;align-items:center;justify-content:center;z-index:200;padding:4px 0;}
-.ad-close{position:absolute;top:4px;right:8px;font-size:11px;color:var(--muted);cursor:pointer;background:none;border:none;font-family:var(--font-b);}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:24px 0 100px;text-align:center;font-size:10px;color:var(--muted);letter-spacing:1px;line-height:1.8;position:relative;z-index:1;}
+
+/* ── INTERSTITIAL ── */
 .interstitial{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:1000;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;}
 .interstitial.active{display:flex;}
 .inter-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
@@ -86,15 +104,24 @@ footer{border-top:1px solid var(--border);padding:24px 0;text-align:center;font-
 .countdown-prog{fill:none;stroke:var(--cyan);stroke-width:3;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;filter:drop-shadow(0 0 4px var(--cyan));}
 .countdown-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--cyan);}
 .inter-status{font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:32px;height:16px;}
-.inter-ad{width:100%;max-width:728px;min-height:90px;background:var(--s1);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:24px;position:relative;}
+
+/* Adsterra 300x250 inside interstitial */
+.inter-ad-wrap{margin-bottom:24px;display:flex;align-items:center;justify-content:center;}
+
 .dl-ready-btn{display:none;padding:14px 40px;font-family:var(--font-d);font-size:13px;letter-spacing:3px;font-weight:700;cursor:pointer;background:var(--green);color:#000;border:none;animation:glowPulse 1s infinite alternate;}
 @keyframes glowPulse{from{box-shadow:0 0 10px rgba(0,255,135,0.3);}to{box-shadow:0 0 30px rgba(0,255,135,0.7);}}
-.inter-skip{margin-top:16px;font-size:10px;color:var(--muted);letter-spacing:1px;cursor:default;}
-@media(max-width:600px){.grid{grid-template-columns:1fr;}.stats-row{gap:20px;}.hero-title{font-size:22px;}}
+.inter-skip{margin-top:16px;font-size:10px;color:var(--muted);letter-spacing:1px;}
+
+@media(max-width:600px){
+  .grid{grid-template-columns:1fr;}
+  .stats-row{gap:20px;}
+  .hero-title{font-size:22px;}
+}
 </style>
 </head>
 <body>
 
+<!-- ── HEADER ── -->
 <header>
   <div class="header-inner">
     <div class="logo">CFG<span>DROP</span></div>
@@ -102,13 +129,22 @@ footer{border-top:1px solid var(--border);padding:24px 0;text-align:center;font-
   </div>
 </header>
 
-<div class="ad-banner-top">
+<!-- ── TOP BANNER AD (Adsterra 300x250 top) ── -->
+<div class="ad-top-wrap">
   <div class="ad-label">ADVERTISEMENT</div>
-  <!-- AD_TOP_BANNER_START -->
-  <div style="color:#1f1f1f;font-size:10px;letter-spacing:2px;">AD SPACE · 728×90</div>
-  <!-- AD_TOP_BANNER_END -->
+  <script>
+    atOptions = {
+      'key' : '362d709550350648387d060b02a03c44',
+      'format' : 'iframe',
+      'height' : 250,
+      'width' : 300,
+      'params' : {}
+    };
+  </script>
+  <script src="https://www.highperformanceformat.com/362d709550350648387d060b02a03c44/invoke.js"></script>
 </div>
 
+<!-- ── MAIN ── -->
 <div class="wrap">
   <div class="hero">
     <div class="hero-title">FREE <span class="highlight">VPN CONFIGS</span><br>UPDATED DAILY</div>
@@ -134,6 +170,7 @@ footer{border-top:1px solid var(--border);padding:24px 0;text-align:center;font-
   </div>
 </div>
 
+<!-- ── FOOTER ── -->
 <footer>
   <div class="wrap">
     CFGDROP · FREE VPN CONFIGS<br>
@@ -141,13 +178,10 @@ footer{border-top:1px solid var(--border);padding:24px 0;text-align:center;font-
   </div>
 </footer>
 
-<div class="ad-sticky" id="sticky-ad">
-  <button class="ad-close" onclick="document.getElementById('sticky-ad').style.display='none'">✕</button>
-  <!-- AD_STICKY_START -->
-  <div style="color:#1f1f1f;font-size:10px;letter-spacing:2px;">AD SPACE · STICKY BOTTOM</div>
-  <!-- AD_STICKY_END -->
-</div>
+<!-- ── ADSTERRA SOCIAL BAR (floating, always visible) ── -->
+<script src="https://pl29143841.profitablecpmratenetwork.com/17/a7/bb/17a7bb74a64e1969ec2125ce087eea62.js"></script>
 
+<!-- ── DOWNLOAD INTERSTITIAL ── -->
 <div class="interstitial" id="interstitial">
   <div class="inter-grid"></div>
   <div class="inter-title">CFGDROP · <span>SECURE DOWNLOAD</span></div>
@@ -159,17 +193,24 @@ footer{border-top:1px solid var(--border);padding:24px 0;text-align:center;font-
     <div class="countdown-num" id="countdown-num">10</div>
   </div>
   <div class="inter-status" id="inter-status">PREPARING YOUR CONFIG...</div>
-  <div class="inter-ad">
-    <!-- AD_INTERSTITIAL_START -->
-    <div style="color:#1f1f1f;font-size:10px;letter-spacing:2px;">AD SPACE · INTERSTITIAL</div>
-    <!-- AD_INTERSTITIAL_END -->
+
+  <!-- Adsterra 300x250 inside countdown screen -->
+  <div class="inter-ad-wrap">
+    <script>
+      atOptions = {
+        'key' : '362d709550350648387d060b02a03c44',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+    </script>
+    <script src="https://www.highperformanceformat.com/362d709550350648387d060b02a03c44/invoke.js"></script>
   </div>
+
   <button class="dl-ready-btn" id="dl-ready-btn">↓ DOWNLOAD CONFIG</button>
   <div class="inter-skip" id="inter-skip">Please wait <span id="skip-num">10</span>s...</div>
 </div>
-
-<!-- ── ADSTERRA SOCIAL BAR ── -->
-<script src="https://pl29143841.profitablecpmratenetwork.com/17/a7/bb/17a7bb74a64e1969ec2125ce087eea62.js"></script>
 
 <script>
 const SUPABASE_URL = 'https://lkruzhkjultgappbhwvq.supabase.co';
@@ -208,8 +249,22 @@ function renderGrid(configs) {
   }
   let html = '';
   configs.forEach((cfg, i) => {
+    // Inject 300x250 ad every 4 configs
     if (i > 0 && i % 4 === 0) {
-      html += `<div class="ad-mid" style="grid-column:1/-1"><div class="ad-label">ADVERTISEMENT</div><div style="color:#1a1a1a;font-size:10px;letter-spacing:2px;">AD SPACE · MID CONTENT</div></div>`;
+      html += `
+        <div class="ad-mid-wrap">
+          <div class="ad-label">ADVERTISEMENT</div>
+          <script>
+            atOptions = {
+              'key' : '362d709550350648387d060b02a03c44',
+              'format' : 'iframe',
+              'height' : 250,
+              'width' : 300,
+              'params' : {}
+            };
+          <\/script>
+          <script src="https://www.highperformanceformat.com/362d709550350648387d060b02a03c44/invoke.js"><\/script>
+        </div>`;
     }
     const dlCount = cfg.downloads || 0;
     const protocol = cfg.protocol || 'CONFIG';
