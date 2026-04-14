@@ -313,7 +313,7 @@ async function uploadConfig() {
   const progInterval = setInterval(() => { prog = Math.min(prog + Math.random() * 15, 85); progressFill.style.width = prog + '%'; }, 200);
 
   const filename = `${Date.now()}-${file.name.replace(/\s+/g,'-')}`;
-  const { data: fileData, error: fileError } = await db.storage.from('configs').upload(filename, file, { cacheControl: '3600', upsert: false });
+  const { data: fileData, error: fileError } = await db.storage.from('Configs').upload(filename, file, { cacheControl: '3600', upsert: false });
 
   clearInterval(progInterval);
 
@@ -325,8 +325,8 @@ async function uploadConfig() {
   }
 
   progressFill.style.width = '95%';
-  const { data: urlData } = db.storage.from('configs').getPublicUrl(fileData.path);
-  const { error: dbError } = await db.from('configs').insert({
+  const { data: urlData } = db.storage.from('Configs').getPublicUrl(fileData.path);
+  const { error: dbError } = await db.from('Configs').insert({
     title, protocol, description: desc,
     server: server || null, expires: expires || null,
     file_url: urlData.publicUrl, file_path: fileData.path, downloads: 0,
@@ -353,7 +353,7 @@ let allConfigs = [];
 async function loadManage() {
   const list = document.getElementById('config-list');
   list.innerHTML = '<div style="font-size:11px;color:#333;text-align:center;padding:40px;">Loading...</div>';
-  const { data, error } = await db.from('configs').select('*').order('created_at', { ascending: false });
+  const { data, error } = await db.from('Configs').select('*').order('created_at', { ascending: false });
   if (error || !data) { list.innerHTML = '<div style="font-size:11px;color:#333;text-align:center;padding:40px;">Failed to load.</div>'; return; }
   allConfigs = data;
   const totalDl = data.reduce((s, c) => s + (c.downloads || 0), 0);
@@ -381,8 +381,8 @@ async function loadManage() {
 
 async function deleteConfig(id, filePath) {
   if (!confirm('Delete this config? Cannot be undone.')) return;
-  await db.storage.from('configs').remove([filePath]);
-  await db.from('configs').delete().eq('id', id);
+  await db.storage.from('Configs').remove([filePath]);
+  await db.from('Configs').delete().eq('id', id);
   loadManage();
 }
 
