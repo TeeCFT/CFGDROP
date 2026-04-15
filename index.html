@@ -223,9 +223,10 @@ let allConfigs = [];
 let currentDownload = null;
 let countdownInterval = null;
 
+// ── FIX 1: Table name matches admin.html ('Configs' with capital C)
 async function loadConfigs() {
   const grid = document.getElementById('config-grid');
-  const { data, error } = await db.from('configs').select('*').order('created_at', { ascending: false });
+  const { data, error } = await db.from('Configs').select('*').order('created_at', { ascending: false });
   if (error || !data) {
     grid.innerHTML = `<div class="empty"><div class="empty-title">NO CONFIGS</div><div style="font-size:11px;color:#333;margin-top:8px;">Check back soon.</div></div>`;
     return;
@@ -249,7 +250,6 @@ function renderGrid(configs) {
   }
   let html = '';
   configs.forEach((cfg, i) => {
-    // Inject 300x250 ad every 4 configs
     if (i > 0 && i % 4 === 0) {
       html += `
         <div class="ad-mid-wrap">
@@ -269,6 +269,9 @@ function renderGrid(configs) {
     const dlCount = cfg.downloads || 0;
     const protocol = cfg.protocol || 'CONFIG';
     const added = new Date(cfg.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short'});
+    // Escape title/url for safe inline onclick attribute
+    const safeTitle = cfg.title.replace(/'/g, "\\'");
+    const safeUrl   = (cfg.file_url || '').replace(/'/g, "\\'");
     html += `
       <div class="config-card" style="animation-delay:${i*0.05}s">
         <div class="card-top">
@@ -282,7 +285,7 @@ function renderGrid(configs) {
           ${cfg.server ? `<span class="meta-tag">${cfg.server}</span>` : ''}
           ${cfg.expires ? `<span class="meta-tag">EXP: ${cfg.expires}</span>` : ''}
         </div>
-        <button class="dl-btn" onclick="startDownload('${cfg.id}', '${cfg.file_url}', '${cfg.title}')">↓ DOWNLOAD</button>
+        <button class="dl-btn" onclick="startDownload('${cfg.id}','${safeUrl}','${safeTitle}')">↓ DOWNLOAD</button>
       </div>`;
   });
   grid.innerHTML = html;
@@ -304,12 +307,12 @@ function startDownload(id, fileUrl, title) {
 }
 
 function runCountdown(seconds) {
-  const numEl = document.getElementById('countdown-num');
-  const progEl = document.getElementById('countdown-prog');
+  const numEl    = document.getElementById('countdown-num');
+  const progEl   = document.getElementById('countdown-prog');
   const statusEl = document.getElementById('inter-status');
-  const skipEl = document.getElementById('inter-skip');
-  const skipNum = document.getElementById('skip-num');
-  const dlBtn = document.getElementById('dl-ready-btn');
+  const skipEl   = document.getElementById('inter-skip');
+  const skipNum  = document.getElementById('skip-num');
+  const dlBtn    = document.getElementById('dl-ready-btn');
   const circumference = 283;
   let remaining = seconds;
   const statuses = ['PREPARING YOUR CONFIG...','VERIFYING FILE INTEGRITY...','ESTABLISHING CONNECTION...','ALMOST READY...'];
@@ -340,17 +343,31 @@ function runCountdown(seconds) {
   }, 1000);
 }
 
-function triggerDownload() {
+// ── FIX 2: Blob fetch so cross-origin Uploadcare files actually download
+//           instead of opening in the browser tab
+async function triggerDownload() {
   if (!currentDownload?.fileUrl) return;
-  const a = document.createElement('a');
-  a.href = currentDownload.fileUrl;
-  a.download = currentDownload.title || 'config';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  try {
+    const res  = await fetch(currentDownload.fileUrl);
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = currentDownload.title || 'config';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch {
+    // Fallback: open directly in new tab if fetch fails
+    window.open(currentDownload.fileUrl, '_blank');
+  }
 }
 
-document.getElementById('dl-ready-btn').addEventListener('click', () => { triggerDownload(); closeInterstitial(); });
+document.getElementById('dl-ready-btn').addEventListener('click', () => {
+  triggerDownload();
+  closeInterstitial();
+});
 
 function closeInterstitial() {
   document.getElementById('interstitial').classList.remove('active');
@@ -362,11 +379,12 @@ document.getElementById('interstitial').addEventListener('click', (e) => {
   if (e.target === document.getElementById('interstitial') && document.getElementById('dl-ready-btn').style.display === 'block') closeInterstitial();
 });
 
+// ── FIX 1 (same): Table name 'Configs' here too
 async function incrementDownloads(id) {
   const config = allConfigs.find(c => c.id === id);
   if (!config) return;
   const newCount = (config.downloads || 0) + 1;
-  await db.from('configs').update({ downloads: newCount }).eq('id', id);
+  await db.from('Configs').update({ downloads: newCount }).eq('id', id);
   config.downloads = newCount;
   updateStats();
 }
