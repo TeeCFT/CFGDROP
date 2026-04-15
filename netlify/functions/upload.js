@@ -1,28 +1,39 @@
-import cloudinary from "cloudinary";
+const cloudinary = require("cloudinary").v2;
 
-cloudinary.v2.config({
+cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-export const handler = async (event) => {
+exports.handler = async (event) => {
   try {
-    const file = JSON.parse(event.body);
+    const body = JSON.parse(event.body);
 
-    const uploadRes = await cloudinary.v2.uploader.upload(file.data, {
+    if (!body.data) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "No file data provided" }),
+      };
+    }
+
+    const uploadRes = await cloudinary.uploader.upload(body.data, {
       resource_type: "auto",
       folder: "cfgdrop",
     });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ url: uploadRes.secure_url }),
+      body: JSON.stringify({
+        url: uploadRes.secure_url,
+      }),
     };
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message }),
+      body: JSON.stringify({
+        error: err.message,
+      }),
     };
   }
 };
