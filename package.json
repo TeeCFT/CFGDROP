@@ -1,0 +1,9 @@
+{
+  "name": "cfgdrop",
+  "version": "1.0.0",
+  "description": "CFGDROP admin backend",
+  "main": "index.js",
+  "dependencies": {
+    "cloudinary": "^2.0.0"
+  }
+}
