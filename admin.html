@@ -4,13 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CFGDROP — Admin</title>
- 
-  <script>
-  UPLOADCARE_PUBLIC_KEY = "2588098b498dce524a55";
-</script>
-
-<script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
-  
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -65,13 +58,17 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;background:var(--s2);border:1px solid var(--border2);color:var(--text);font-family:var(--font-b);font-size:12px;outline:none;transition:border-color 0.15s;resize:vertical;}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--cyan);}
 .form-group select option{background:var(--s1);}
+
+/* ── UPLOADCARE DROP ZONE ── */
 .drop-zone{border:1px dashed var(--border2);padding:32px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;}
-.drop-zone:hover,.drop-zone.drag{border-color:var(--cyan);background:rgba(0,229,255,0.03);}
-.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.drop-zone:hover,.drop-zone.drag,.drop-zone.has-file{border-color:var(--cyan);background:rgba(0,229,255,0.03);}
+.drop-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
 .drop-icon{font-size:28px;margin-bottom:8px;}
 .drop-text{font-size:11px;color:var(--dim);letter-spacing:1px;margin-bottom:4px;}
 .drop-sub{font-size:10px;color:var(--muted);letter-spacing:1px;}
 .drop-filename{font-size:11px;color:var(--cyan);margin-top:8px;display:none;}
+.uc-status{font-size:10px;margin-top:10px;letter-spacing:1px;display:none;}
+
 .btn{padding:11px 24px;font-family:var(--font-d);font-size:11px;letter-spacing:2px;font-weight:700;cursor:pointer;border:none;transition:all 0.15s;}
 .btn-primary{background:var(--cyan);color:#000;}
 .btn-primary:hover{background:#fff;}
@@ -84,6 +81,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 .progress-bar{height:3px;background:var(--border2);position:relative;overflow:hidden;}
 .progress-fill{height:100%;background:var(--cyan);width:0%;transition:width 0.3s ease;box-shadow:0 0 8px var(--cyan);}
 .upload-status{font-size:11px;margin-top:8px;display:none;}
+
 .config-list{display:flex;flex-direction:column;gap:8px;}
 .config-item{background:var(--s2);border:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;gap:16px;transition:border-color 0.15s;}
 .config-item:hover{border-color:var(--border2);}
@@ -184,18 +182,21 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
         <div class="form-row full">
           <div class="form-group">
             <label>CONFIG FILE</label>
+            <!-- Custom drop zone — file picked here, uploaded via Uploadcare API on submit -->
             <div class="drop-zone" id="drop-zone">
-              <input type="file" id="file-input">
+              <input type="file" id="file-input" accept=".txt,.ovpn,.conf,.json,.xml,.vmess,.vless">
               <div class="drop-icon">↑</div>
               <div class="drop-text">DROP FILE HERE OR CLICK TO BROWSE</div>
               <div class="drop-sub">TXT · OVPN · CONF · JSON · XML</div>
               <div class="drop-filename" id="drop-filename"></div>
             </div>
+            <!-- Upload progress shown inside the zone area -->
+            <div class="uc-status" id="uc-status"></div>
           </div>
         </div>
         <button class="btn btn-primary" onclick="uploadConfig()" id="upload-btn">↑ UPLOAD CONFIG</button>
         <div class="progress-wrap" id="progress-wrap">
-          <div class="progress-label">UPLOADING...</div>
+          <div class="progress-label" id="progress-label">UPLOADING TO UPLOADCARE...</div>
           <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
         </div>
         <div class="upload-status" id="upload-status"></div>
@@ -239,18 +240,30 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 </div>
 
 <script>
-const SUPABASE_URL = 'https://lkruzhkjultgappbhwvq.supabase.co';
+// ════════════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════════════
+const SUPABASE_URL      = 'https://lkruzhkjultgappbhwvq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxrcnV6aGtqdWx0Z2FwcGJod3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2Nzg3MTQsImV4cCI6MjA5MTI1NDcxNH0.qSxwE01YLfjG28jV7YKJQsiM1HIar9JCOaJKvmMhfq0';
+
+// Uploadcare — only public key needed for uploads
+// file_path in DB stores the UUID so we can build the CDN URL or delete later
+const UC_PUBLIC_KEY = '2588098b498dce524a55';
+const UC_UPLOAD_URL = 'https://upload.uploadcare.com/base/';
+const UC_CDN_BASE   = 'https://ucarecdn.com/';
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ── AUTH ──
+
+// ════════════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════════════
 async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-pass').value;
-  const btn = document.getElementById('login-btn');
-  const errEl = document.getElementById('login-error');
+  const email  = document.getElementById('login-email').value.trim();
+  const pass   = document.getElementById('login-pass').value;
+  const btn    = document.getElementById('login-btn');
+  const errEl  = document.getElementById('login-error');
   if (!email || !pass) { errEl.style.display='block'; errEl.textContent='Fill in all fields.'; return; }
   btn.disabled = true; btn.textContent = 'VERIFYING...'; errEl.style.display = 'none';
   const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
@@ -258,27 +271,29 @@ async function doLogin() {
     errEl.style.display = 'block'; errEl.textContent = 'Access denied.';
     btn.disabled = false; btn.textContent = 'ENTER'; return;
   }
-  document.getElementById('sidebar-user').textContent = email;
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  loadManage();
+  bootApp(email);
 }
 
 async function doLogout() { await db.auth.signOut(); location.reload(); }
 
 (async () => {
   const { data: { session } } = await db.auth.getSession();
-  if (session) {
-    document.getElementById('sidebar-user').textContent = session.user.email;
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    loadManage();
-  }
+  if (session) bootApp(session.user.email);
 })();
+
+function bootApp(email) {
+  document.getElementById('sidebar-user').textContent = email;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadManage();
+}
 
 document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
-// ── TABS ──
+
+// ════════════════════════════════════════════════
+//  TABS
+// ════════════════════════════════════════════════
 function switchTab(tab) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -287,125 +302,188 @@ function switchTab(tab) {
   if (tab === 'manage') loadManage();
 }
 
-// ── FILE INPUT ──
-const fileInput = document.getElementById('file-input');
-const dropZone = document.getElementById('drop-zone');
+
+// ════════════════════════════════════════════════
+//  FILE INPUT (custom drop zone)
+// ════════════════════════════════════════════════
+const fileInput    = document.getElementById('file-input');
+const dropZone     = document.getElementById('drop-zone');
 const dropFilename = document.getElementById('drop-filename');
+
 fileInput.addEventListener('change', () => {
-  if (fileInput.files[0]) { dropFilename.textContent = '✓ ' + fileInput.files[0].name; dropFilename.style.display = 'block'; }
+  if (fileInput.files[0]) {
+    dropFilename.textContent = '✓ ' + fileInput.files[0].name;
+    dropFilename.style.display = 'block';
+    dropZone.classList.add('has-file');
+  }
 });
 ['dragover','dragenter'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('drag'); }));
 ['dragleave','drop'].forEach(e => dropZone.addEventListener(e, () => dropZone.classList.remove('drag')));
 
-// ── UPLOAD ──
+
+// ════════════════════════════════════════════════
+//  UPLOADCARE — upload a File object, return { uuid, cdnUrl }
+// ════════════════════════════════════════════════
+function uploadToUploadcare(file, onProgress) {
+  return new Promise((resolve, reject) => {
+    const formData = new FormData();
+    formData.append('UPLOADCARE_PUB_KEY', UC_PUBLIC_KEY);
+    formData.append('UPLOADCARE_STORE', '1');   // keep file permanently
+    formData.append('file', file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', UC_UPLOAD_URL, true);
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 90));
+    };
+
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        try {
+          const resp = JSON.parse(xhr.responseText);
+          if (resp.file) {
+            resolve({
+              uuid:   resp.file,
+              cdnUrl: `${UC_CDN_BASE}${resp.file}/`
+            });
+          } else {
+            reject(new Error('Uploadcare: no file UUID in response'));
+          }
+        } catch (e) { reject(new Error('Uploadcare: invalid response')); }
+      } else {
+        reject(new Error(`Uploadcare: HTTP ${xhr.status}`));
+      }
+    };
+    xhr.onerror = () => reject(new Error('Uploadcare: network error'));
+    xhr.send(formData);
+  });
+}
+
+// Delete a file from Uploadcare via REST API
+// NOTE: deletion requires a secret key — if you don't want to expose it here,
+// handle it server-side. This function is a no-op stub unless you add the secret key.
+async function deleteFromUploadcare(uuid) {
+  // To enable: add your Uploadcare SECRET key below.
+  // const UC_SECRET_KEY = 'your_secret_key_here';
+  // await fetch(`https://api.uploadcare.com/files/${uuid}/storage/`, {
+  //   method: 'DELETE',
+  //   headers: { 'Authorization': `Uploadcare.Simple ${UC_PUBLIC_KEY}:${UC_SECRET_KEY}` }
+  // });
+  console.log('Uploadcare delete skipped (no secret key) — UUID:', uuid);
+}
+
+
+// ════════════════════════════════════════════════
+//  UPLOAD PANEL — main handler
+// ════════════════════════════════════════════════
 async function uploadConfig() {
-  const title = document.getElementById('up-title').value.trim();
-  const protocol = document.getElementById('up-protocol').value;
-  const desc = document.getElementById('up-desc').value.trim();
-  const server = document.getElementById('up-server').value.trim();
-  const expires = document.getElementById('up-expires').value.trim();
-  const file = fileInput.files[0];
-  const statusEl = document.getElementById('upload-status');
+  const title     = document.getElementById('up-title').value.trim();
+  const protocol  = document.getElementById('up-protocol').value;
+  const desc      = document.getElementById('up-desc').value.trim();
+  const server    = document.getElementById('up-server').value.trim();
+  const expires   = document.getElementById('up-expires').value.trim();
+  const file      = fileInput.files[0];
+
+  const statusEl     = document.getElementById('upload-status');
   const progressWrap = document.getElementById('progress-wrap');
   const progressFill = document.getElementById('progress-fill');
-  const uploadBtn = document.getElementById('upload-btn');
+  const progressLbl  = document.getElementById('progress-label');
+  const uploadBtn    = document.getElementById('upload-btn');
 
   if (!title || !file) {
     statusEl.style.display = 'block'; statusEl.style.color = 'var(--red)';
     statusEl.textContent = '✗ Title and file are required.'; return;
   }
 
-  uploadBtn.disabled = true; progressWrap.style.display = 'block'; statusEl.style.display = 'none';
-  let prog = 0;
-  const progInterval = setInterval(() => { prog = Math.min(prog + Math.random() * 15, 85); progressFill.style.width = prog + '%'; }, 200);
+  uploadBtn.disabled = true;
+  progressWrap.style.display = 'block';
+  statusEl.style.display = 'none';
+  progressLbl.textContent = 'UPLOADING TO UPLOADCARE...';
+  progressFill.style.width = '0%';
 
-  const reader = new FileReader();
-
-reader.onloadend = async () => {
+  let ucResult;
   try {
-    const res = await fetch('/.netlify/functions/upload', {
-      method: 'POST',
-      body: JSON.stringify({
-        data: reader.result
-      })
+    ucResult = await uploadToUploadcare(file, (pct) => {
+      progressFill.style.width = pct + '%';
     });
-
-    const result = await res.json();
-
-    if (!result.url) throw new Error("Upload failed");
-
-    const { error: dbError } = await db.from('Configs').insert({
-      title,
-      protocol,
-      description: desc,
-      server: server || null,
-      expires: expires || null,
-      file_url: result.url,
-      downloads: 0,
-    });
-
-    progressFill.style.width = '100%';
-
-    if (dbError) {
-      statusEl.style.display = 'block';
-      statusEl.style.color = 'var(--red)';
-      statusEl.textContent = '✗ DB error: ' + dbError.message;
-    } else {
-      statusEl.style.display = 'block';
-      statusEl.style.color = 'var(--green)';
-      statusEl.textContent = '✓ Config uploaded!';
-    }
-
   } catch (err) {
-    statusEl.style.display = 'block';
-    statusEl.style.color = 'var(--red)';
-    statusEl.textContent = '✗ ' + err.message;
+    progressFill.style.width = '0%';
+    progressWrap.style.display = 'none';
+    statusEl.style.display = 'block'; statusEl.style.color = 'var(--red)';
+    statusEl.textContent = '✗ Upload failed: ' + err.message;
+    uploadBtn.disabled = false; return;
   }
 
-  uploadBtn.disabled = false;
-};
+  // File is now on Uploadcare CDN — save metadata to Supabase
+  progressFill.style.width = '95%';
+  progressLbl.textContent = 'SAVING TO DATABASE...';
 
-reader.readAsDataURL(file);
-  
   const { error: dbError } = await db.from('Configs').insert({
-    title, protocol, description: desc,
-    server: server || null, expires: expires || null,
-    file_url: urlData.publicUrl, file_path: fileData.path, downloads: 0,
+    title,
+    protocol,
+    description: desc,
+    server:      server  || null,
+    expires:     expires || null,
+    file_url:    ucResult.cdnUrl,   // public CDN download link
+    file_path:   ucResult.uuid,     // UUID stored for deletion / reference
+    downloads:   0,
   });
 
   progressFill.style.width = '100%';
   statusEl.style.display = 'block';
+
   if (dbError) {
-    statusEl.style.color = 'var(--red)'; statusEl.textContent = '✗ DB error: ' + dbError.message;
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = '✗ DB error: ' + dbError.message;
   } else {
-    statusEl.style.color = 'var(--green)'; statusEl.textContent = '✓ Config uploaded successfully!';
-    document.getElementById('up-title').value = '';
-    document.getElementById('up-desc').value = '';
-    document.getElementById('up-server').value = '';
+    statusEl.style.color = 'var(--green)';
+    statusEl.textContent = '✓ Config uploaded successfully!';
+    // Clear form
+    document.getElementById('up-title').value   = '';
+    document.getElementById('up-desc').value    = '';
+    document.getElementById('up-server').value  = '';
     document.getElementById('up-expires').value = '';
-    fileInput.value = ''; dropFilename.style.display = 'none';
+    fileInput.value = '';
+    dropFilename.style.display = 'none';
+    dropZone.classList.remove('has-file');
     setTimeout(() => { progressWrap.style.display = 'none'; progressFill.style.width = '0%'; }, 1500);
   }
   uploadBtn.disabled = false;
 }
 
-// ── MANAGE ──
+
+// ════════════════════════════════════════════════
+//  MANAGE PANEL
+// ════════════════════════════════════════════════
 let allConfigs = [];
+
 async function loadManage() {
   const list = document.getElementById('config-list');
   list.innerHTML = '<div style="font-size:11px;color:#333;text-align:center;padding:40px;">Loading...</div>';
+
   const { data, error } = await db.from('Configs').select('*').order('created_at', { ascending: false });
-  if (error || !data) { list.innerHTML = '<div style="font-size:11px;color:#333;text-align:center;padding:40px;">Failed to load.</div>'; return; }
+  if (error || !data) {
+    list.innerHTML = '<div style="font-size:11px;color:#333;text-align:center;padding:40px;">Failed to load.</div>';
+    return;
+  }
   allConfigs = data;
-  const totalDl = data.reduce((s, c) => s + (c.downloads || 0), 0);
-  const topDl = data.length ? Math.max(...data.map(c => c.downloads || 0)) : 0;
-  const today = new Date().toDateString();
+
+  const totalDl   = data.reduce((s, c) => s + (c.downloads || 0), 0);
+  const topDl     = data.length ? Math.max(...data.map(c => c.downloads || 0)) : 0;
+  const today     = new Date().toDateString();
   const addedToday = data.filter(c => new Date(c.created_at).toDateString() === today).length;
-  document.getElementById('stat-total').textContent = data.length;
+
+  document.getElementById('stat-total').textContent     = data.length;
   document.getElementById('stat-downloads').textContent = totalDl > 999 ? (totalDl/1000).toFixed(1)+'K' : totalDl;
-  document.getElementById('stat-today').textContent = addedToday;
-  document.getElementById('stat-top').textContent = topDl;
-  if (!data.length) { list.innerHTML = '<div style="font-size:11px;color:#333;text-align:center;padding:40px;">No configs yet. Upload one above.</div>'; return; }
+  document.getElementById('stat-today').textContent     = addedToday;
+  document.getElementById('stat-top').textContent       = topDl;
+
+  if (!data.length) {
+    list.innerHTML = '<div style="font-size:11px;color:#333;text-align:center;padding:40px;">No configs yet. Upload one above.</div>';
+    return;
+  }
+
   list.innerHTML = data.map(cfg => {
     const date = new Date(cfg.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
     return `<div class="config-item">
@@ -420,30 +498,35 @@ async function loadManage() {
   }).join('');
 }
 
-async function deleteConfig(id, filePath) {
+async function deleteConfig(id, fileUUID) {
   if (!confirm('Delete this config? Cannot be undone.')) return;
-  await db.storage.from('Configs').remove([filePath]);
+  // Remove from Uploadcare (requires secret key — see deleteFromUploadcare above)
+  await deleteFromUploadcare(fileUUID);
+  // Remove DB record
   await db.from('Configs').delete().eq('id', id);
   loadManage();
 }
 
-// ── TREND INTEL ──
+
+// ════════════════════════════════════════════════
+//  TREND INTEL
+// ════════════════════════════════════════════════
 const NORTH_CONTEXT = `You are the content intelligence system for North — a young South African creator, entrepreneur, forex trader, and music producer building the NDS (North Dream Studio) brand. Niches: forex, music production, startups/apps, street culture, fashion, South African culture, cinematic storytelling, entrepreneurship. YouTube growth is #1 priority in 2026.`;
 const SUBREDDITS = ['streetwear','sneakers','hiphopheads','artificial','startups','SideProject','MachineLearning','Daytrading','Forex','entrepreneur','WeAreTheMusicMakers','makinghiphop','OutOfTheLoop','InternetIsBeautiful','futurology','TikTokCringe'];
 const NEWS_FEEDS = [
-  {name:'TechCrunch',url:'https://techcrunch.com/feed/'},
+  {name:'TechCrunch',   url:'https://techcrunch.com/feed/'},
   {name:'Rolling Stone',url:'https://www.rollingstone.com/feed/'},
-  {name:'Hypebeast',url:'https://hypebeast.com/feed'},
-  {name:'The Verge',url:'https://www.theverge.com/rss/index.xml'},
-  {name:'BBC Tech',url:'https://feeds.bbci.co.uk/news/technology/rss.xml'},
+  {name:'Hypebeast',    url:'https://hypebeast.com/feed'},
+  {name:'The Verge',    url:'https://www.theverge.com/rss/index.xml'},
+  {name:'BBC Tech',     url:'https://feeds.bbci.co.uk/news/technology/rss.xml'},
 ];
 const PROXY = 'https://api.allorigins.win/get?url=';
 let scanRunning = false;
-let allTrends = [];
+let allTrends   = [];
 
 async function fetchReddit(sub) {
   try {
-    const res = await fetch(`${PROXY}${encodeURIComponent(`https://www.reddit.com/r/${sub}/rising.json?limit=10&raw_json=1`)}`);
+    const res  = await fetch(`${PROXY}${encodeURIComponent(`https://www.reddit.com/r/${sub}/rising.json?limit=10&raw_json=1`)}`);
     const json = await res.json();
     const data = JSON.parse(json.contents);
     return (data?.data?.children||[]).map(p=>({title:p.data.title,score:p.data.score,source:`Reddit r/${sub}`,type:'reddit'}));
@@ -451,9 +534,9 @@ async function fetchReddit(sub) {
 }
 async function fetchHN() {
   try {
-    const res = await fetch(`${PROXY}${encodeURIComponent('https://hacker-news.firebaseio.com/v0/newstories.json')}`);
-    const json = await res.json();
-    const ids = JSON.parse(json.contents).slice(0,20);
+    const res   = await fetch(`${PROXY}${encodeURIComponent('https://hacker-news.firebaseio.com/v0/newstories.json')}`);
+    const json  = await res.json();
+    const ids   = JSON.parse(json.contents).slice(0,20);
     const stories = await Promise.all(ids.slice(0,10).map(id=>fetch(`${PROXY}${encodeURIComponent(`https://hacker-news.firebaseio.com/v0/item/${id}.json`)}`).then(r=>r.json()).then(j=>JSON.parse(j.contents)).catch(()=>null)));
     return stories.filter(Boolean).filter(s=>s?.title).map(s=>({title:s.title,score:s.score||0,source:'HackerNews',type:'hn'}));
   } catch { return []; }
@@ -462,15 +545,15 @@ async function fetchYouTube() {
   try {
     const res = await fetch(`${PROXY}${encodeURIComponent('https://www.youtube.com/feeds/videos.xml?chart=mostpopular&regionCode=US')}`);
     const json = await res.json();
-    const xml = new DOMParser().parseFromString(json.contents,'text/xml');
+    const xml  = new DOMParser().parseFromString(json.contents,'text/xml');
     return Array.from(xml.querySelectorAll('entry')).slice(0,15).map(e=>({title:e.querySelector('title')?.textContent||'',source:'YouTube Trending',type:'youtube'}));
   } catch { return []; }
 }
 async function fetchNews(feed) {
   try {
-    const res = await fetch(`${PROXY}${encodeURIComponent(feed.url)}`);
+    const res  = await fetch(`${PROXY}${encodeURIComponent(feed.url)}`);
     const json = await res.json();
-    const xml = new DOMParser().parseFromString(json.contents,'text/xml');
+    const xml  = new DOMParser().parseFromString(json.contents,'text/xml');
     return Array.from(xml.querySelectorAll('item')).slice(0,8).map(item=>({title:item.querySelector('title')?.textContent||'',source:feed.name,type:'news'}));
   } catch { return []; }
 }
@@ -499,13 +582,13 @@ async function runBrief() {
     if (posts.length) addLog(`  ✓ r/${sub} (${posts.length})`);
   }
   addLog('→ Scanning HackerNews...');
-  const hn = await fetchHN(); signals = [...signals,...hn];
+  const hn = await fetchHN(); signals=[...signals,...hn];
   addLog(`  ✓ HackerNews (${hn.length})`);
   addLog('→ Scanning YouTube...');
-  const yt = await fetchYouTube(); signals = [...signals,...yt];
+  const yt = await fetchYouTube(); signals=[...signals,...yt];
   addLog(`  ✓ YouTube (${yt.length})`);
   addLog('→ Scanning news feeds...');
-  for (const feed of NEWS_FEEDS) { const a = await fetchNews(feed); signals=[...signals,...a]; if(a.length) addLog(`  ✓ ${feed.name} (${a.length})`); }
+  for (const feed of NEWS_FEEDS) { const a=await fetchNews(feed); signals=[...signals,...a]; if(a.length) addLog(`  ✓ ${feed.name} (${a.length})`); }
   addLog(`→ ${signals.length} signals — running AI...`);
 
   try {
@@ -524,8 +607,8 @@ async function runBrief() {
 function filterTrends(cat) {
   document.querySelectorAll('[data-tf]').forEach(b => {
     b.style.background = b.dataset.tf===cat?'var(--cyan)':'transparent';
-    b.style.color = b.dataset.tf===cat?'#000':'var(--dim)';
-    b.style.border = b.dataset.tf===cat?'none':'1px solid var(--border2)';
+    b.style.color      = b.dataset.tf===cat?'#000':'var(--dim)';
+    b.style.border     = b.dataset.tf===cat?'none':'1px solid var(--border2)';
   });
   renderTrends(cat==='All'?allTrends:allTrends.filter(t=>t.category===cat));
 }
