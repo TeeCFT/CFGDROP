@@ -8,7 +8,7 @@ cloudinary.config({
 
 exports.handler = async (event) => {
   try {
-    const body = JSON.parse(event.body);
+    const body = JSON.parse(event.body || "{}");
 
     if (!body.data) {
       return {
@@ -24,16 +24,12 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        url: uploadRes.secure_url,
-      }),
+      body: JSON.stringify({ url: uploadRes.secure_url }),
     };
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        error: err.message,
-      }),
+      body: JSON.stringify({ error: err.message }),
     };
   }
 };
