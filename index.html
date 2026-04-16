@@ -285,7 +285,7 @@ function renderGrid(configs) {
           ${cfg.server ? `<span class="meta-tag">${cfg.server}</span>` : ''}
           ${cfg.expires ? `<span class="meta-tag">EXP: ${cfg.expires}</span>` : ''}
         </div>
-        <button class="dl-btn" onclick="startDownload('${cfg.id}','${safeUrl}','${safeTitle}')">↓ DOWNLOAD</button>
+        <button class="dl-btn" onclick="startDownload('${cfg.id}','${safeUrl}','${safeTitle}','${(cfg.file_name||'').replace(/'/g,"\\'")}')">↓ DOWNLOAD</button>
       </div>`;
   });
   grid.innerHTML = html;
@@ -300,8 +300,8 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
   });
 });
 
-function startDownload(id, fileUrl, title) {
-  currentDownload = { id, fileUrl, title };
+function startDownload(id, fileUrl, title, fileName) {
+  currentDownload = { id, fileUrl, title, fileName };
   document.getElementById('interstitial').classList.add('active');
   runCountdown(10);
 }
@@ -344,7 +344,9 @@ function runCountdown(seconds) {
 }
 
 // ── FIX 2: Blob fetch so cross-origin Uploadcare files actually download
-//           instead of opening in the browser tab
+//           instead of opening in the browser tab.
+//           Uses stored file_name (original filename with extension) so the
+//           downloaded file keeps the correct extension e.g. .hc / .ovpn / .conf
 async function triggerDownload() {
   if (!currentDownload?.fileUrl) return;
   try {
@@ -353,13 +355,12 @@ async function triggerDownload() {
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href     = url;
-    a.download = currentDownload.title || 'config';
+    a.download = currentDownload.fileName || currentDownload.title || 'config';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   } catch {
-    // Fallback: open directly in new tab if fetch fails
     window.open(currentDownload.fileUrl, '_blank');
   }
 }
