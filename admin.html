@@ -425,8 +425,9 @@ async function uploadConfig() {
     description: desc,
     server:      server  || null,
     expires:     expires || null,
-    file_url:    ucResult.cdnUrl,   // public CDN download link
-    file_path:   ucResult.uuid,     // UUID stored for deletion / reference
+    file_url:    ucResult.cdnUrl,
+    file_path:   ucResult.uuid,
+    file_name:   file.name,   // ← ADD THIS LINE
     downloads:   0,
   });
 
@@ -656,4 +657,5 @@ function renderTrends(trends) {
 function toggleExpand(i){const el=document.getElementById(`trend-expand-${i}`);if(!el)return;const isOpen=el.style.display==='block';document.querySelectorAll('.trend-expand').forEach(e=>e.style.display='none');if(!isOpen)el.style.display='block';}
 </script>
 </body>
-</html>
+  </html>
+  
