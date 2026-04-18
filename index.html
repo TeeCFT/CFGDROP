@@ -5,10 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CFGDROP — Free VPN Configs</title>
 <meta name="referrer" content="no-referrer-when-downgrade" />
-<meta name="monetag" content="ffcb76681868a71efeb18a668b32735c">
-
-<!-- Monetag Popunder — head only, never touched -->
-<script>(function(s){s.dataset.zone='10873102',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+<!-- Monetag REMOVED -->
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -23,8 +20,6 @@
 body{background:var(--bg);color:var(--text);font-family:var(--font-b);min-height:100vh;overflow-x:hidden;position:relative;}
 body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
 .wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 20px;}
-
-/* HEADER */
 header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdrop-filter:blur(10px);position:sticky;top:0;z-index:100;}
 .header-inner{max-width:900px;margin:0 auto;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;}
 .logo{font-family:var(--font-d);font-size:18px;font-weight:900;letter-spacing:4px;color:var(--cyan);text-shadow:0 0 20px rgba(0,229,255,0.4);}
@@ -32,8 +27,6 @@ header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdro
 .status-pill{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--dim);letter-spacing:1px;}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
-
-/* HERO */
 .hero{padding:48px 0 32px;text-align:center;animation:fadeUp 0.6s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 .hero-title{font-family:var(--font-d);font-size:clamp(24px,5vw,40px);font-weight:900;letter-spacing:3px;line-height:1.1;margin-bottom:12px;}
@@ -43,17 +36,11 @@ header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdro
 .stat{text-align:center;}
 .stat-num{font-size:20px;font-weight:500;color:var(--cyan);}
 .stat-label{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
-
-/* ACTIVITY BAR */
 .activity-bar{text-align:center;margin:0 0 8px;font-size:10px;color:var(--dim);letter-spacing:1px;}
 .activity-bar span{color:var(--red);font-weight:600;}
-
-/* FILTERS */
 .filters{display:flex;gap:8px;flex-wrap:wrap;padding:20px 0 16px;}
 .filter-btn{padding:6px 14px;font-family:var(--font-b);font-size:10px;letter-spacing:1px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--dim);transition:all 0.15s;}
 .filter-btn:hover,.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,0.05);}
-
-/* GRID */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:10px;padding-bottom:100px;}
 .config-card{background:var(--s1);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden;transition:border-color 0.2s,transform 0.2s;animation:fadeUp 0.5s ease both;}
 .config-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:opacity 0.2s;}
@@ -65,29 +52,21 @@ header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdro
 .dl-count{font-size:10px;color:var(--dim);display:flex;align-items:center;gap:4px;}
 .card-title{font-family:var(--font-d);font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:8px;line-height:1.3;}
 .card-desc{font-size:11px;color:var(--dim);line-height:1.6;margin-bottom:12px;}
-.card-meta{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;align-items:center;}
+.card-meta{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
 .meta-tag{font-size:9px;color:var(--muted);letter-spacing:1px;padding:2px 6px;border:1px solid var(--border2);}
-/* Scarcity tag */
 .scarcity-tag{font-size:9px;letter-spacing:1px;padding:2px 7px;color:var(--red);border:1px solid rgba(255,59,59,0.3);background:rgba(255,59,59,0.06);}
-
-/* UNLOCK BUTTON */
 .unlock-btn{width:100%;padding:13px;font-family:var(--font-d);font-size:12px;letter-spacing:3px;font-weight:700;cursor:pointer;background:var(--cyan);color:#000;border:none;transition:all 0.15s;position:relative;overflow:hidden;}
 .unlock-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);transform:translateX(-100%);transition:transform 0.4s;}
 .unlock-btn:hover::before{transform:translateX(100%);}
 .unlock-btn:hover{background:#fff;box-shadow:0 0 24px rgba(0,229,255,0.4);}
 .unlock-btn:active{transform:scale(0.98);}
-/* Cloud unlock — yellow tint */
 .unlock-btn.cloud{background:var(--yellow);}
 .unlock-btn.cloud:hover{background:#fff;box-shadow:0 0 24px rgba(255,230,0,0.4);}
-
-/* LOADING / EMPTY */
 .loading{text-align:center;padding:80px 0;color:var(--dim);font-size:11px;letter-spacing:2px;}
 .loading-dot{display:inline-block;animation:blink 1s infinite;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
 .empty{text-align:center;padding:80px 0;color:var(--muted);}
 .empty-title{font-family:var(--font-d);font-size:16px;letter-spacing:3px;margin-bottom:8px;}
-
-/* FOOTER */
 footer{border-top:1px solid var(--border);padding:24px 0 100px;text-align:center;font-size:10px;color:var(--muted);letter-spacing:1px;line-height:1.8;position:relative;z-index:1;}
 
 /* INTERSTITIAL */
@@ -102,25 +81,18 @@ footer{border-top:1px solid var(--border);padding:24px 0 100px;text-align:center
 .countdown-prog{fill:none;stroke:var(--cyan);stroke-width:3;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;filter:drop-shadow(0 0 4px var(--cyan));}
 .countdown-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--cyan);}
 .inter-status{font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:20px;height:16px;}
-
-/* Interstitial ad — static, one unit, never re-injected */
+/* Ad container — empty until first unlock click */
 .inter-ad-wrap{margin-bottom:20px;display:flex;align-items:center;justify-content:center;min-height:260px;}
-
-/* UNLOCK READY BUTTON */
 .unlock-ready-btn{display:none;padding:16px 48px;font-family:var(--font-d);font-size:14px;letter-spacing:3px;font-weight:900;cursor:pointer;border:none;position:relative;overflow:hidden;}
 .unlock-ready-btn.dl{background:var(--green);color:#000;animation:glowGreen 1s infinite alternate;}
 .unlock-ready-btn.cp{background:var(--yellow);color:#000;animation:glowYellow 1s infinite alternate;}
 @keyframes glowGreen{from{box-shadow:0 0 12px rgba(0,255,135,0.4);}to{box-shadow:0 0 32px rgba(0,255,135,0.8);}}
 @keyframes glowYellow{from{box-shadow:0 0 12px rgba(255,230,0,0.4);}to{box-shadow:0 0 32px rgba(255,230,0,0.8);}}
-
 .inter-skip{margin-top:14px;font-size:10px;color:var(--muted);letter-spacing:1px;}
-
-/* POST-DOWNLOAD NUDGE */
 .nudge{display:none;margin-top:16px;text-align:center;}
 .nudge-text{font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;}
 .nudge-btn{padding:8px 20px;font-family:var(--font-d);font-size:10px;letter-spacing:2px;cursor:pointer;background:transparent;color:var(--cyan);border:1px solid var(--cyan);transition:all 0.15s;}
 .nudge-btn:hover{background:var(--cyan);color:#000;}
-
 @media(max-width:600px){
   .grid{grid-template-columns:1fr;}
   .stats-row{gap:20px;}
@@ -148,7 +120,6 @@ footer{border-top:1px solid var(--border);padding:24px 0 100px;text-align:center
     </div>
   </div>
 
-  <!-- Live activity counter — updates every few seconds for urgency -->
   <div class="activity-bar"><span id="activity-num">18</span> users unlocked a config in the last 5 minutes</div>
 
   <div class="filters">
@@ -172,14 +143,16 @@ footer{border-top:1px solid var(--border);padding:24px 0 100px;text-align:center
   </div>
 </footer>
 
-<!-- Adsterra Social Bar — static, floating -->
+<!-- Adsterra Social Bar — static, passive income -->
 <script src="https://pl29143841.profitablecpmratenetwork.com/17/a7/bb/17a7bb74a64e1969ec2125ce087eea62.js"></script>
+
+<!-- Adsterra Popunder — static, Adsterra handles trigger logic -->
+<script src="https://pl29174765.profitablecpmratenetwork.com/05/9d/b2/059db2173c249fbd552ea0d9ad10a5cd.js"></script>
 
 <!-- INTERSTITIAL -->
 <div class="interstitial" id="interstitial">
   <div class="inter-grid"></div>
   <div class="inter-title">CFGDROP · <span id="inter-title-sub">UNLOCK CONFIG</span></div>
-
   <div class="countdown-wrap">
     <svg class="countdown-svg" viewBox="0 0 100 100">
       <circle class="countdown-track" cx="50" cy="50" r="45"/>
@@ -187,21 +160,13 @@ footer{border-top:1px solid var(--border);padding:24px 0 100px;text-align:center
     </svg>
     <div class="countdown-num" id="countdown-num">10</div>
   </div>
-
   <div class="inter-status" id="inter-status">🔐 Verifying access...</div>
 
-  <!-- 300x250 — ONE static unit, only placement on the page -->
-  <div class="inter-ad-wrap">
-    <script type="text/javascript">
-      atOptions = {'key':'362d709550350648387d060b02a03c44','format':'iframe','height':250,'width':300,'params':{}};
-    </script>
-    <script type="text/javascript" src="https://www.highperformanceformat.com/362d709550350648387d060b02a03c44/invoke.js"></script>
-  </div>
+  <!-- 300x250 — empty container, lazy-loaded on first unlock only -->
+  <div class="inter-ad-wrap" id="inter-ad"></div>
 
   <button class="unlock-ready-btn" id="unlock-ready-btn">🔓 UNLOCK &amp; GET CONFIG</button>
   <div class="inter-skip" id="inter-skip">Please wait <span id="skip-num">10</span>s...</div>
-
-  <!-- Post-unlock nudge -->
   <div class="nudge" id="nudge">
     <div class="nudge-text">✓ Config unlocked — want more?</div>
     <button class="nudge-btn" onclick="closeInterstitial()">↩ SEE MORE CONFIGS</button>
@@ -213,15 +178,12 @@ var SUPABASE_URL      = 'https://lkruzhkjultgappbhwvq.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxrcnV6aGtqdWx0Z2FwcGJod3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2Nzg3MTQsImV4cCI6MjA5MTI1NDcxNH0.qSxwE01YLfjG28jV7YKJQsiM1HIar9JCOaJKvmMhfq0';
 var db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Adsterra popunder — fires on unlock click (peak intent)
-var ADSTERRA_POPUNDER = 'https://pl29174765.profitablecpmratenetwork.com/05/9d/b2/059db2173c249fbd552ea0d9ad10a5cd.js';
-
 var allConfigs      = [];
-var cloudTextMap    = {};   // id → config_text (populated on render, never lost)
+var cloudTextMap    = {};
 var currentDownload = null;
 var countdownInterval = null;
 
-// ── ACTIVITY COUNTER (fake urgency — fluctuates naturally)
+// ── ACTIVITY COUNTER
 var activityBase = Math.floor(Math.random() * 10) + 14;
 document.getElementById('activity-num').textContent = activityBase;
 setInterval(function() {
@@ -229,6 +191,21 @@ setInterval(function() {
   activityBase = Math.max(8, Math.min(40, activityBase + delta));
   document.getElementById('activity-num').textContent = activityBase;
 }, 7000);
+
+// ── 300x250 LAZY LOAD
+// Loads exactly once on first unlock — ad is visible and at peak intent.
+// dataset.loaded flag prevents duplicate injection on repeat clicks.
+function loadInterstitialAd() {
+  var adWrap = document.getElementById('inter-ad');
+  if (adWrap.dataset.loaded) return;
+  adWrap.dataset.loaded = 'true';
+  var s1 = document.createElement('script');
+  s1.textContent = "atOptions={'key':'362d709550350648387d060b02a03c44','format':'iframe','height':250,'width':300,'params':{}};";
+  var s2 = document.createElement('script');
+  s2.src = 'https://www.highperformanceformat.com/362d709550350648387d060b02a03c44/invoke.js';
+  adWrap.appendChild(s1);
+  adWrap.appendChild(s2);
+}
 
 // ── LOAD CONFIGS
 async function loadConfigs() {
@@ -239,12 +216,10 @@ async function loadConfigs() {
     return;
   }
   allConfigs = res.data;
-
-  // Build cloudTextMap immediately from raw data — before any rendering
+  // Build cloudTextMap from raw data immediately — survives all re-renders
   allConfigs.forEach(function(cfg) {
     if (cfg.config_text) cloudTextMap[cfg.id] = cfg.config_text;
   });
-
   updateStats();
   renderGrid(allConfigs);
 }
@@ -255,7 +230,6 @@ function updateStats() {
   document.getElementById('total-downloads').textContent = totalDl > 999 ? (totalDl/1000).toFixed(1)+'K' : totalDl;
 }
 
-// Scarcity labels — rotate through these
 var scarcityLabels = ['⚡ Fast server','⚡ Limited slots','🔥 High demand','✅ Working now'];
 
 function renderGrid(configs) {
@@ -266,23 +240,20 @@ function renderGrid(configs) {
   }
   var html = '';
   configs.forEach(function(cfg, i) {
-    var isCloud   = !!cfg.config_text && !cfg.file_url;
-    var dlCount   = cfg.downloads || 0;
-    var protocol  = cfg.protocol  || 'CONFIG';
-    var added     = new Date(cfg.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-    var scarcity  = scarcityLabels[i % scarcityLabels.length];
+    var isCloud  = !!cfg.config_text && !cfg.file_url;
+    var dlCount  = cfg.downloads || 0;
+    var protocol = cfg.protocol  || 'CONFIG';
+    var added    = new Date(cfg.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    var scarcity = scarcityLabels[i % scarcityLabels.length];
     var safeTitle = (cfg.title||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     var safeName  = (cfg.file_name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     var safeUrl   = (cfg.file_url||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-
     var badge = isCloud
       ? '<span class="cloud-badge">CLOUD</span>'
       : '<span class="protocol-badge">'+protocol+'</span>';
-
     var btn = isCloud
       ? '<button class="unlock-btn cloud" onclick="startUnlock(\''+cfg.id+'\',\'\',\''+safeTitle+'\',\'\',true)">🔓 UNLOCK CONFIG</button>'
       : '<button class="unlock-btn"       onclick="startUnlock(\''+cfg.id+'\',\''+safeUrl+'\',\''+safeTitle+'\',\''+safeName+'\',false)">🔓 UNLOCK CONFIG</button>';
-
     html += '<div class="config-card" style="animation-delay:'+(i*0.05)+'s">'
       +'<div class="card-top">'+badge+'<span class="dl-count">↓ '+dlCount.toLocaleString()+'</span></div>'
       +'<div class="card-title">'+(cfg.title||'Untitled')+'</div>'
@@ -292,9 +263,7 @@ function renderGrid(configs) {
       +(cfg.server  ? '<span class="meta-tag">'+cfg.server+'</span>' : '')
       +(cfg.expires ? '<span class="meta-tag">EXP: '+cfg.expires+'</span>' : '')
       +'<span class="scarcity-tag">'+scarcity+'</span>'
-      +'</div>'
-      +btn
-      +'</div>';
+      +'</div>'+btn+'</div>';
   });
   grid.innerHTML = html;
 }
@@ -308,24 +277,26 @@ document.querySelectorAll('.filter-btn').forEach(function(btn) {
   });
 });
 
-// ── UNLOCK FLOW (same entry point for both file and cloud)
+// ── UNLOCK FLOW
 function startUnlock(id, fileUrl, title, fileName, isCloud) {
   currentDownload = {
-    id       : id,
-    fileUrl  : fileUrl,
-    title    : title,
-    fileName : fileName,
-    isCloud  : isCloud,
-    // Pull cloud text from the pre-built map — reliable even after re-renders
+    id        : id,
+    fileUrl   : fileUrl,
+    title     : title,
+    fileName  : fileName,
+    isCloud   : isCloud,
     configText: isCloud ? (cloudTextMap[id] || null) : null
   };
-
   var readyBtn = document.getElementById('unlock-ready-btn');
-  readyBtn.className = 'unlock-ready-btn ' + (isCloud ? 'cp' : 'dl');
+  readyBtn.className   = 'unlock-ready-btn ' + (isCloud ? 'cp' : 'dl');
+  readyBtn.textContent = '🔓 UNLOCK & GET CONFIG';
+  readyBtn.style.background = '';
   readyBtn.style.display = 'none';
   document.getElementById('inter-title-sub').textContent = isCloud ? 'CLOUD CONFIG' : 'UNLOCK CONFIG';
-  document.getElementById('nudge').style.display = 'none';
+  document.getElementById('nudge').style.display  = 'none';
   document.getElementById('interstitial').classList.add('active');
+  // Load the 300x250 at peak intent — only fires once ever (dataset.loaded guard)
+  loadInterstitialAd();
   runCountdown(10);
 }
 
@@ -345,7 +316,6 @@ function runCountdown(seconds) {
   var readyBtn = document.getElementById('unlock-ready-btn');
   var circ     = 283;
   var remaining = seconds;
-
   readyBtn.style.display = 'none';
   skipEl.style.display   = 'block';
   numEl.textContent      = remaining;
@@ -354,7 +324,6 @@ function runCountdown(seconds) {
   progEl.style.strokeDashoffset = 0;
   progEl.style.stroke    = 'var(--cyan)';
   statusEl.textContent   = STATUSES[0];
-
   if (countdownInterval) clearInterval(countdownInterval);
   countdownInterval = setInterval(function() {
     remaining--;
@@ -362,7 +331,6 @@ function runCountdown(seconds) {
     skipNum.textContent = remaining;
     progEl.style.strokeDashoffset = circ * (1 - remaining / seconds);
     statusEl.textContent = STATUSES[Math.min(Math.floor((seconds - remaining) / (seconds / STATUSES.length)), STATUSES.length - 1)];
-
     if (remaining <= 0) {
       clearInterval(countdownInterval);
       skipEl.style.display = 'none';
@@ -376,13 +344,8 @@ function runCountdown(seconds) {
   }, 1000);
 }
 
-// ── UNLOCK BUTTON CLICK — ad fires first, then deliver config
+// ── UNLOCK BUTTON — deliver config
 document.getElementById('unlock-ready-btn').addEventListener('click', function() {
-  // Fire Adsterra popunder at peak intent moment
-  var s = document.createElement('script');
-  s.src = ADSTERRA_POPUNDER;
-  document.body.appendChild(s);
-
   if (currentDownload && currentDownload.isCloud) {
     doCloudCopy();
   } else {
@@ -393,7 +356,6 @@ document.getElementById('unlock-ready-btn').addEventListener('click', function()
 function doFileDownload() {
   if (!currentDownload || !currentDownload.fileUrl) return;
   var dlUrl = currentDownload.fileUrl;
-  // Uploadcare CDN operation: Content-Disposition attachment, preserves extension
   if (dlUrl.indexOf('ucarecdn.com') !== -1) {
     if (dlUrl.slice(-1) !== '/') dlUrl += '/';
     dlUrl += '-/inline/no/';
@@ -410,32 +372,31 @@ function doFileDownload() {
 }
 
 function doCloudCopy() {
-  var text = currentDownload && currentDownload.configText;
+  // Always check map first — survives re-renders
+  var text = (currentDownload && currentDownload.configText)
+    || (currentDownload && cloudTextMap[currentDownload.id])
+    || null;
   if (!text) {
-    // Last-resort fallback: check map again in case render updated it
-    text = currentDownload ? cloudTextMap[currentDownload.id] : null;
-  }
-  if (!text) {
-    document.getElementById('inter-status').textContent = '✗ Config text not found. Try re-uploading.';
+    document.getElementById('inter-status').textContent = '✗ Config text missing. Re-upload in admin.';
     return;
   }
-  var readyBtn = document.getElementById('unlock-ready-btn');
+  var btn = document.getElementById('unlock-ready-btn');
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(function() {
-      readyBtn.textContent = '✓ COPIED TO CLIPBOARD!';
-      readyBtn.style.background = 'var(--green)';
+      btn.textContent = '✓ COPIED TO CLIPBOARD!';
+      btn.style.background = 'var(--green)';
       showNudge();
       incrementDownloads(currentDownload.id);
-    }).catch(function() { fallbackCopy(text, readyBtn); });
+    }).catch(function() { fallbackCopy(text, btn); });
   } else {
-    fallbackCopy(text, readyBtn);
+    fallbackCopy(text, btn);
   }
 }
 
 function fallbackCopy(text, btn) {
   var ta = document.createElement('textarea');
   ta.value = text;
-  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;width:1px;height:1px;';
   document.body.appendChild(ta);
   ta.focus();
   ta.select();
@@ -458,18 +419,16 @@ function showNudge() {
 
 function closeInterstitial() {
   document.getElementById('interstitial').classList.remove('active');
-  var readyBtn = document.getElementById('unlock-ready-btn');
-  readyBtn.textContent = '🔓 UNLOCK & GET CONFIG';
-  readyBtn.style.background = '';
   document.getElementById('nudge').style.display = 'none';
   if (countdownInterval) clearInterval(countdownInterval);
   currentDownload = null;
 }
 
-// Tap outside to close (only after unlock is done)
 document.getElementById('interstitial').addEventListener('click', function(e) {
-  var nudgeVisible = document.getElementById('nudge').style.display === 'block';
-  if (e.target === document.getElementById('interstitial') && nudgeVisible) closeInterstitial();
+  if (e.target === document.getElementById('interstitial')
+    && document.getElementById('nudge').style.display === 'block') {
+    closeInterstitial();
+  }
 });
 
 async function incrementDownloads(id) {
