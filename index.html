@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CFGDROP — Free VPN Configs</title>
 <meta name="referrer" content="no-referrer-when-downgrade" />
-<!-- Monetag REMOVED -->
-
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -27,7 +25,9 @@ header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdro
 .status-pill{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--dim);letter-spacing:1px;}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
-.hero{padding:48px 0 32px;text-align:center;animation:fadeUp 0.6s ease both;}
+
+/* HERO */
+.hero{padding:48px 0 24px;text-align:center;animation:fadeUp 0.6s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 .hero-title{font-family:var(--font-d);font-size:clamp(24px,5vw,40px);font-weight:900;letter-spacing:3px;line-height:1.1;margin-bottom:12px;}
 .hero-title .highlight{color:var(--cyan);}
@@ -36,11 +36,20 @@ header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdro
 .stat{text-align:center;}
 .stat-num{font-size:20px;font-weight:500;color:var(--cyan);}
 .stat-label{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
-.activity-bar{text-align:center;margin:0 0 8px;font-size:10px;color:var(--dim);letter-spacing:1px;}
+
+/* 320x50 BANNER — sits under hero, static */
+.banner-320{display:flex;justify-content:center;align-items:center;padding:12px 0;min-height:74px;}
+
+/* ACTIVITY */
+.activity-bar{text-align:center;margin:4px 0 0;font-size:10px;color:var(--dim);letter-spacing:1px;}
 .activity-bar span{color:var(--red);font-weight:600;}
-.filters{display:flex;gap:8px;flex-wrap:wrap;padding:20px 0 16px;}
+
+/* FILTERS */
+.filters{display:flex;gap:8px;flex-wrap:wrap;padding:16px 0;}
 .filter-btn{padding:6px 14px;font-family:var(--font-b);font-size:10px;letter-spacing:1px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--dim);transition:all 0.15s;}
 .filter-btn:hover,.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,0.05);}
+
+/* GRID */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:10px;padding-bottom:100px;}
 .config-card{background:var(--s1);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden;transition:border-color 0.2s,transform 0.2s;animation:fadeUp 0.5s ease both;}
 .config-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:opacity 0.2s;}
@@ -49,7 +58,7 @@ header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdro
 .card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
 .protocol-badge{font-size:9px;letter-spacing:2px;padding:3px 8px;border:1px solid rgba(0,229,255,0.3);color:var(--cyan);background:rgba(0,229,255,0.06);}
 .cloud-badge{font-size:9px;letter-spacing:2px;padding:3px 8px;border:1px solid rgba(255,230,0,0.3);color:var(--yellow);background:rgba(255,230,0,0.06);}
-.dl-count{font-size:10px;color:var(--dim);display:flex;align-items:center;gap:4px;}
+.dl-count{font-size:10px;color:var(--dim);}
 .card-title{font-family:var(--font-d);font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:8px;line-height:1.3;}
 .card-desc{font-size:11px;color:var(--dim);line-height:1.6;margin-bottom:12px;}
 .card-meta{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
@@ -62,6 +71,7 @@ header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdro
 .unlock-btn:active{transform:scale(0.98);}
 .unlock-btn.cloud{background:var(--yellow);}
 .unlock-btn.cloud:hover{background:#fff;box-shadow:0 0 24px rgba(255,230,0,0.4);}
+
 .loading{text-align:center;padding:80px 0;color:var(--dim);font-size:11px;letter-spacing:2px;}
 .loading-dot{display:inline-block;animation:blink 1s infinite;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
@@ -73,30 +83,36 @@ footer{border-top:1px solid var(--border);padding:24px 0 100px;text-align:center
 .interstitial{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:1000;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;overflow-y:auto;}
 .interstitial.active{display:flex;}
 .inter-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
-.inter-title{font-family:var(--font-d);font-size:11px;letter-spacing:4px;color:var(--dim);margin-bottom:24px;}
+.inter-title{font-family:var(--font-d);font-size:11px;letter-spacing:4px;color:var(--dim);margin-bottom:20px;}
 .inter-title span{color:var(--cyan);}
-.countdown-wrap{position:relative;width:100px;height:100px;margin-bottom:24px;}
+.inter-top-row{display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:20px;flex-wrap:wrap;}
+.countdown-wrap{position:relative;width:100px;height:100px;flex-shrink:0;}
 .countdown-svg{position:absolute;inset:0;transform:rotate(-90deg);}
 .countdown-track{fill:none;stroke:var(--border2);stroke-width:3;}
 .countdown-prog{fill:none;stroke:var(--cyan);stroke-width:3;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;filter:drop-shadow(0 0 4px var(--cyan));}
 .countdown-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--cyan);}
-.inter-status{font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:20px;height:16px;}
-/* Ad container — empty until first unlock click */
-.inter-ad-wrap{margin-bottom:20px;display:flex;align-items:center;justify-content:center;min-height:260px;}
-.unlock-ready-btn{display:none;padding:16px 48px;font-family:var(--font-d);font-size:14px;letter-spacing:3px;font-weight:900;cursor:pointer;border:none;position:relative;overflow:hidden;}
+/* 468x60 sits beside the countdown */
+.ad-468{display:flex;align-items:center;justify-content:center;min-width:468px;min-height:60px;}
+.inter-status{font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:16px;height:16px;}
+/* 300x250 sits below status */
+.ad-300{display:flex;align-items:center;justify-content:center;min-height:250px;margin-bottom:16px;}
+.unlock-ready-btn{display:none;padding:16px 48px;font-family:var(--font-d);font-size:14px;letter-spacing:3px;font-weight:900;cursor:pointer;border:none;}
 .unlock-ready-btn.dl{background:var(--green);color:#000;animation:glowGreen 1s infinite alternate;}
 .unlock-ready-btn.cp{background:var(--yellow);color:#000;animation:glowYellow 1s infinite alternate;}
 @keyframes glowGreen{from{box-shadow:0 0 12px rgba(0,255,135,0.4);}to{box-shadow:0 0 32px rgba(0,255,135,0.8);}}
 @keyframes glowYellow{from{box-shadow:0 0 12px rgba(255,230,0,0.4);}to{box-shadow:0 0 32px rgba(255,230,0,0.8);}}
-.inter-skip{margin-top:14px;font-size:10px;color:var(--muted);letter-spacing:1px;}
-.nudge{display:none;margin-top:16px;text-align:center;}
+.inter-skip{margin-top:12px;font-size:10px;color:var(--muted);letter-spacing:1px;}
+.nudge{display:none;margin-top:14px;text-align:center;}
 .nudge-text{font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;}
 .nudge-btn{padding:8px 20px;font-family:var(--font-d);font-size:10px;letter-spacing:2px;cursor:pointer;background:transparent;color:var(--cyan);border:1px solid var(--cyan);transition:all 0.15s;}
 .nudge-btn:hover{background:var(--cyan);color:#000;}
+
 @media(max-width:600px){
   .grid{grid-template-columns:1fr;}
   .stats-row{gap:20px;}
   .hero-title{font-size:22px;}
+  .inter-top-row{flex-direction:column;gap:12px;}
+  .ad-468{min-width:unset;width:100%;}
 }
 </style>
 </head>
@@ -118,6 +134,12 @@ footer{border-top:1px solid var(--border);padding:24px 0 100px;text-align:center
       <div class="stat"><div class="stat-num" id="total-downloads">—</div><div class="stat-label">DOWNLOADS</div></div>
       <div class="stat"><div class="stat-num">FREE</div><div class="stat-label">ALWAYS</div></div>
     </div>
+  </div>
+
+  <!-- 320x50 — static, loads on page render, one placement only -->
+  <div class="banner-320">
+    <script type="text/javascript">atOptions={'key':'a63fd0dc7ea0888b1df2a07fc9dbb1d5','format':'iframe','height':50,'width':320,'params':{}};</script>
+    <script type="text/javascript" src="https://www.highperformanceformat.com/a63fd0dc7ea0888b1df2a07fc9dbb1d5/invoke.js"></script>
   </div>
 
   <div class="activity-bar"><span id="activity-num">18</span> users unlocked a config in the last 5 minutes</div>
@@ -143,27 +165,33 @@ footer{border-top:1px solid var(--border);padding:24px 0 100px;text-align:center
   </div>
 </footer>
 
-<!-- Adsterra Social Bar — static, passive income -->
+<!-- Social Bar — static, passive -->
 <script src="https://pl29143841.profitablecpmratenetwork.com/17/a7/bb/17a7bb74a64e1969ec2125ce087eea62.js"></script>
-
-<!-- Adsterra Popunder — static, Adsterra handles trigger logic -->
+<!-- Popunder — static, Adsterra handles trigger -->
 <script src="https://pl29174765.profitablecpmratenetwork.com/05/9d/b2/059db2173c249fbd552ea0d9ad10a5cd.js"></script>
 
 <!-- INTERSTITIAL -->
 <div class="interstitial" id="interstitial">
   <div class="inter-grid"></div>
   <div class="inter-title">CFGDROP · <span id="inter-title-sub">UNLOCK CONFIG</span></div>
-  <div class="countdown-wrap">
-    <svg class="countdown-svg" viewBox="0 0 100 100">
-      <circle class="countdown-track" cx="50" cy="50" r="45"/>
-      <circle class="countdown-prog" id="countdown-prog" cx="50" cy="50" r="45"/>
-    </svg>
-    <div class="countdown-num" id="countdown-num">10</div>
+
+  <!-- Countdown + 468x60 side by side -->
+  <div class="inter-top-row">
+    <div class="countdown-wrap">
+      <svg class="countdown-svg" viewBox="0 0 100 100">
+        <circle class="countdown-track" cx="50" cy="50" r="45"/>
+        <circle class="countdown-prog" id="countdown-prog" cx="50" cy="50" r="45"/>
+      </svg>
+      <div class="countdown-num" id="countdown-num">10</div>
+    </div>
+    <!-- 468x60 — empty, injected once when interstitial first opens -->
+    <div class="ad-468" id="ad-468"></div>
   </div>
+
   <div class="inter-status" id="inter-status">🔐 Verifying access...</div>
 
-  <!-- 300x250 — empty container, lazy-loaded on first unlock only -->
-  <div class="inter-ad-wrap" id="inter-ad"></div>
+  <!-- 300x250 — empty, injected once when interstitial first opens -->
+  <div class="ad-300" id="ad-300"></div>
 
   <button class="unlock-ready-btn" id="unlock-ready-btn">🔓 UNLOCK &amp; GET CONFIG</button>
   <div class="inter-skip" id="inter-skip">Please wait <span id="skip-num">10</span>s...</div>
@@ -192,19 +220,31 @@ setInterval(function() {
   document.getElementById('activity-num').textContent = activityBase;
 }, 7000);
 
-// ── 300x250 LAZY LOAD
-// Loads exactly once on first unlock — ad is visible and at peak intent.
-// dataset.loaded flag prevents duplicate injection on repeat clicks.
-function loadInterstitialAd() {
-  var adWrap = document.getElementById('inter-ad');
-  if (adWrap.dataset.loaded) return;
-  adWrap.dataset.loaded = 'true';
-  var s1 = document.createElement('script');
-  s1.textContent = "atOptions={'key':'362d709550350648387d060b02a03c44','format':'iframe','height':250,'width':300,'params':{}};";
-  var s2 = document.createElement('script');
-  s2.src = 'https://www.highperformanceformat.com/362d709550350648387d060b02a03c44/invoke.js';
-  adWrap.appendChild(s1);
-  adWrap.appendChild(s2);
+// ── INTERSTITIAL ADS — injected once when interstitial first opens
+// dataset.loaded flag ensures each unit only ever runs one time
+function loadInterstitialAds() {
+  var w468 = document.getElementById('ad-468');
+  var w300 = document.getElementById('ad-300');
+
+  if (!w468.dataset.loaded) {
+    w468.dataset.loaded = 'true';
+    var s1 = document.createElement('script');
+    s1.textContent = "atOptions={'key':'6b7cdd4612a03ba105e11dde9ed808f4','format':'iframe','height':60,'width':468,'params':{}};";
+    var s2 = document.createElement('script');
+    s2.src = 'https://www.highperformanceformat.com/6b7cdd4612a03ba105e11dde9ed808f4/invoke.js';
+    w468.appendChild(s1);
+    w468.appendChild(s2);
+  }
+
+  if (!w300.dataset.loaded) {
+    w300.dataset.loaded = 'true';
+    var s3 = document.createElement('script');
+    s3.textContent = "atOptions={'key':'362d709550350648387d060b02a03c44','format':'iframe','height':250,'width':300,'params':{}};";
+    var s4 = document.createElement('script');
+    s4.src = 'https://www.highperformanceformat.com/362d709550350648387d060b02a03c44/invoke.js';
+    w300.appendChild(s3);
+    w300.appendChild(s4);
+  }
 }
 
 // ── LOAD CONFIGS
@@ -216,7 +256,7 @@ async function loadConfigs() {
     return;
   }
   allConfigs = res.data;
-  // Build cloudTextMap from raw data immediately — survives all re-renders
+  // Build cloudTextMap from raw data — survives all re-renders
   allConfigs.forEach(function(cfg) {
     if (cfg.config_text) cloudTextMap[cfg.id] = cfg.config_text;
   });
@@ -288,15 +328,15 @@ function startUnlock(id, fileUrl, title, fileName, isCloud) {
     configText: isCloud ? (cloudTextMap[id] || null) : null
   };
   var readyBtn = document.getElementById('unlock-ready-btn');
-  readyBtn.className   = 'unlock-ready-btn ' + (isCloud ? 'cp' : 'dl');
-  readyBtn.textContent = '🔓 UNLOCK & GET CONFIG';
+  readyBtn.className    = 'unlock-ready-btn ' + (isCloud ? 'cp' : 'dl');
+  readyBtn.textContent  = '🔓 UNLOCK & GET CONFIG';
   readyBtn.style.background = '';
   readyBtn.style.display = 'none';
   document.getElementById('inter-title-sub').textContent = isCloud ? 'CLOUD CONFIG' : 'UNLOCK CONFIG';
   document.getElementById('nudge').style.display  = 'none';
   document.getElementById('interstitial').classList.add('active');
-  // Load the 300x250 at peak intent — only fires once ever (dataset.loaded guard)
-  loadInterstitialAd();
+  // Load both interstitial ads when screen opens — visible, peak intent, once only
+  loadInterstitialAds();
   runCountdown(10);
 }
 
@@ -330,21 +370,25 @@ function runCountdown(seconds) {
     numEl.textContent   = remaining;
     skipNum.textContent = remaining;
     progEl.style.strokeDashoffset = circ * (1 - remaining / seconds);
-    statusEl.textContent = STATUSES[Math.min(Math.floor((seconds - remaining) / (seconds / STATUSES.length)), STATUSES.length - 1)];
+    statusEl.textContent = STATUSES[Math.min(
+      Math.floor((seconds - remaining) / (seconds / STATUSES.length)),
+      STATUSES.length - 1
+    )];
     if (remaining <= 0) {
       clearInterval(countdownInterval);
       skipEl.style.display = 'none';
       statusEl.textContent = '✅ Your config is ready — unlock now';
       numEl.textContent    = '🔓';
       numEl.style.fontSize = '24px';
-      numEl.style.color    = currentDownload && currentDownload.isCloud ? 'var(--yellow)' : 'var(--green)';
-      progEl.style.stroke  = currentDownload && currentDownload.isCloud ? 'var(--yellow)' : 'var(--green)';
+      var isCloud = currentDownload && currentDownload.isCloud;
+      numEl.style.color   = isCloud ? 'var(--yellow)' : 'var(--green)';
+      progEl.style.stroke = isCloud ? 'var(--yellow)' : 'var(--green)';
       readyBtn.style.display = 'block';
     }
   }, 1000);
 }
 
-// ── UNLOCK BUTTON — deliver config
+// ── UNLOCK BUTTON
 document.getElementById('unlock-ready-btn').addEventListener('click', function() {
   if (currentDownload && currentDownload.isCloud) {
     doCloudCopy();
@@ -360,7 +404,7 @@ function doFileDownload() {
     if (dlUrl.slice(-1) !== '/') dlUrl += '/';
     dlUrl += '-/inline/no/';
   }
-  var a      = document.createElement('a');
+  var a = document.createElement('a');
   a.href     = dlUrl;
   a.download = currentDownload.fileName || currentDownload.title || 'config';
   a.target   = '_blank';
@@ -372,22 +416,18 @@ function doFileDownload() {
 }
 
 function doCloudCopy() {
-  // Always check map first — survives re-renders
   var text = (currentDownload && currentDownload.configText)
-    || (currentDownload && cloudTextMap[currentDownload.id])
-    || null;
+          || (currentDownload && cloudTextMap[currentDownload.id])
+          || null;
   if (!text) {
     document.getElementById('inter-status').textContent = '✗ Config text missing. Re-upload in admin.';
     return;
   }
   var btn = document.getElementById('unlock-ready-btn');
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(function() {
-      btn.textContent = '✓ COPIED TO CLIPBOARD!';
-      btn.style.background = 'var(--green)';
-      showNudge();
-      incrementDownloads(currentDownload.id);
-    }).catch(function() { fallbackCopy(text, btn); });
+    navigator.clipboard.writeText(text)
+      .then(function() { copySuccess(btn); })
+      .catch(function() { fallbackCopy(text, btn); });
   } else {
     fallbackCopy(text, btn);
   }
@@ -398,18 +438,21 @@ function fallbackCopy(text, btn) {
   ta.value = text;
   ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;width:1px;height:1px;';
   document.body.appendChild(ta);
-  ta.focus();
-  ta.select();
+  ta.focus(); ta.select();
   try {
     document.execCommand('copy');
-    btn.textContent = '✓ COPIED TO CLIPBOARD!';
-    btn.style.background = 'var(--green)';
-    showNudge();
-    incrementDownloads(currentDownload.id);
+    copySuccess(btn);
   } catch(e) {
     btn.textContent = '✗ COPY FAILED — LONG PRESS TO COPY';
   }
   document.body.removeChild(ta);
+}
+
+function copySuccess(btn) {
+  btn.textContent = '✓ COPIED TO CLIPBOARD!';
+  btn.style.background = 'var(--green)';
+  showNudge();
+  incrementDownloads(currentDownload.id);
 }
 
 function showNudge() {
