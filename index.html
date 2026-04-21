@@ -479,9 +479,8 @@ document.getElementById('interstitial').addEventListener('click', function(e) {
 async function incrementDownloads(id) {
   var config = allConfigs.find(function(c){ return c.id === id; });
   if (!config) return;
-  var newCount = (config.downloads || 0) + 1;
-  await db.from('Configs').update({ downloads: newCount }).eq('id', id);
-  config.downloads = newCount;
+  await db.rpc('increment_downloads', { row_id: id });
+  config.downloads = (config.downloads || 0) + 1;
   updateStats();
 }
 
