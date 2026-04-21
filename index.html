@@ -183,7 +183,7 @@ footer{border-top:1px solid var(--border);padding:24px 0 100px;text-align:center
         <circle class="countdown-track" cx="50" cy="50" r="45"/>
         <circle class="countdown-prog" id="countdown-prog" cx="50" cy="50" r="45"/>
       </svg>
-      <div class="countdown-num" id="countdown-num">10</div>
+      <div class="countdown-num" id="countdown-num">20</div>
     </div>
     <!-- 468x60 — empty, injected once when interstitial first opens -->
     <div class="ad-468" id="ad-468"></div>
@@ -195,7 +195,7 @@ footer{border-top:1px solid var(--border);padding:24px 0 100px;text-align:center
   <div class="ad-300" id="ad-300"></div>
 
   <button class="unlock-ready-btn" id="unlock-ready-btn">🔓 UNLOCK &amp; GET CONFIG</button>
-  <div class="inter-skip" id="inter-skip">Please wait <span id="skip-num">10</span>s...</div>
+  <div class="inter-skip" id="inter-skip">Please wait <span id="skip-num">20</span>s...</div>
   <div class="nudge" id="nudge">
     <div class="nudge-text">✓ Config unlocked — want more?</div>
     <button class="nudge-btn" onclick="closeInterstitial()">↩ SEE MORE CONFIGS</button>
@@ -338,7 +338,7 @@ function startUnlock(id, fileUrl, title, fileName, isCloud) {
   document.getElementById('interstitial').classList.add('active');
   // Load both interstitial ads when screen opens — visible, peak intent, once only
   loadInterstitialAds();
-  runCountdown(10);
+  runCountdown(20);
 }
 
 var STATUSES = [
