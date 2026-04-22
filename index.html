@@ -52,7 +52,7 @@ header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdro
 .filter-btn:hover,.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,0.05);}
 
 /* GRID */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:10px;padding-bottom:100px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:10px;padding-bottom:80px;}
 .config-card{background:var(--s1);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden;transition:border-color 0.2s,transform 0.2s;animation:fadeUp 0.5s ease both;}
 .config-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:opacity 0.2s;}
 .config-card:hover{border-color:var(--border2);transform:translateY(-1px);}
@@ -79,7 +79,7 @@ header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdro
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
 .empty{text-align:center;padding:80px 0;color:var(--muted);}
 .empty-title{font-family:var(--font-d);font-size:16px;letter-spacing:3px;margin-bottom:8px;}
-footer{border-top:1px solid var(--border);padding:24px 0 100px;text-align:center;font-size:10px;color:var(--muted);letter-spacing:1px;line-height:1.8;position:relative;z-index:1;}
+footer{border-top:1px solid var(--border);padding:24px 0 20px;text-align:center;font-size:10px;color:var(--muted);letter-spacing:1px;line-height:1.8;position:relative;z-index:1;}
 
 /* INTERSTITIAL */
 .interstitial{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:1000;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;overflow-y:auto;}
@@ -123,7 +123,10 @@ footer{border-top:1px solid var(--border);padding:24px 0 100px;text-align:center
 <header>
   <div class="header-inner">
     <div class="logo">ITACHI <span>CFG DROP</span></div>
-    <div class="status-pill"><div class="dot"></div><span>CONFIGS LIVE</span></div>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <a href="/affiliates.html" style="font-size:10px;color:var(--yellow);letter-spacing:2px;text-decoration:none;font-family:var(--font-d);">🐐 AFFILIATES</a>
+      <div class="status-pill"><div class="dot"></div><span>CONFIGS LIVE</span></div>
+    </div>
   </div>
 </header>
 
@@ -511,5 +514,37 @@ l.parentNode.insertBefore(s, l);
 })({})
 </script> 
 
+<!-- Referral Tracker -->
+<script>
+(function() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var refCode   = urlParams.get('ref');
+  if (!refCode) return;
+  var visitorId = localStorage.getItem('cfg_visitor_id');
+  if (!visitorId) {
+    visitorId = 'v_' + Date.now() + '_' + Math.random().toString(36).substr(2,9);
+    localStorage.setItem('cfg_visitor_id', visitorId);
+  }
+  var usedKey = 'ref_used_' + refCode;
+  if (localStorage.getItem(usedKey)) return;
+  var startTime = Date.now();
+  var tracked   = false;
+  async function checkAndTrack() {
+    if (tracked) return;
+    if (Date.now() - startTime < 45000) return;
+    var dupCheck = await db.from('referral_visits').select('id').eq('visitor_id', visitorId).eq('ref_code', refCode).limit(1);
+    if (dupCheck.data && dupCheck.data.length > 0) { localStorage.setItem(usedKey,'1'); tracked=true; return; }
+    var ins = await db.from('referral_visits').insert({ ref_code:refCode, visitor_id:visitorId, ip_hash:'client', time_spent:Math.round((Date.now()-startTime)/1000), status:'valid' });
+    if (!ins.error) {
+      await db.rpc('increment_referrals', { affiliate_code: refCode });
+      localStorage.setItem(usedKey,'1');
+      tracked = true;
+    }
+  }
+  var t = setInterval(function(){ checkAndTrack().then(function(){ if(tracked) clearInterval(t); }); }, 5000);
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) checkAndTrack(); });
+})();
+</script>    
+    
 </body>
 </html>
