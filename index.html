@@ -94,7 +94,7 @@ footer{border-top:1px solid var(--border);padding:24px 0 20px;text-align:center;
 .countdown-prog{fill:none;stroke:var(--cyan);stroke-width:3;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;filter:drop-shadow(0 0 4px var(--cyan));}
 .countdown-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--cyan);}
 /* 468x60 sits beside the countdown */
-.ad-468{display:flex;align-items:center;justify-content:center;min-width:468px;min-height:60px;}
+.ad-468{display:flex;align-items:center;justify-content:center;width:100%;max-width:320px;min-height:50px;}
 .inter-status{font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:16px;height:16px;}
 /* 300x250 sits below status */
 .ad-300{display:flex;align-items:center;justify-content:center;min-height:250px;margin-bottom:16px;}
@@ -193,22 +193,27 @@ footer{border-top:1px solid var(--border);padding:24px 0 20px;text-align:center;
   <div class="inter-grid"></div>
   <div class="inter-title">ITACHI CFG DROP · <span id="inter-title-sub">UNLOCK CONFIG</span></div>
 
-  <!-- Countdown + 468x60 side by side -->
-  <div class="inter-top-row">
-    <div class="countdown-wrap">
-      <svg class="countdown-svg" viewBox="0 0 100 100">
-        <circle class="countdown-track" cx="50" cy="50" r="45"/>
-        <circle class="countdown-prog" id="countdown-prog" cx="50" cy="50" r="45"/>
-      </svg>
-      <div class="countdown-num" id="countdown-num">20</div>
-    </div>
-    <!-- 468x60 — empty, injected once when interstitial first opens -->
-    <div class="ad-468" id="ad-468"></div>
+  <!-- Countdown centered -->
+  <div class="countdown-wrap">
+    <svg class="countdown-svg" viewBox="0 0 100 100">
+      <circle class="countdown-track" cx="50" cy="50" r="45"/>
+      <circle class="countdown-prog" id="countdown-prog" cx="50" cy="50" r="45"/>
+    </svg>
+    <div class="countdown-num" id="countdown-num">20</div>
   </div>
 
   <div class="inter-status" id="inter-status">🔐 Verifying access...</div>
 
-  <!-- 300x250 — empty, injected once when interstitial first opens -->
+  <!-- 320x50 — mobile friendly -->
+  <div class="ad-468" id="ad-468"></div>
+
+  <!-- Socials during wait -->
+  <div style="display:flex;justify-content:center;gap:20px;margin:12px 0;">
+    <a href="https://t.me/baywaveinternet" target="_blank" style="color:#29A8E8;font-size:11px;letter-spacing:2px;text-decoration:none;font-family:var(--font-d);">✈️ TELEGRAM</a>
+    <a href="https://chat.whatsapp.com/HDGKhy2BgOv3kmBl9hqQ4Q" target="_blank" style="color:#25D366;font-size:11px;letter-spacing:2px;text-decoration:none;font-family:var(--font-d);">💬 WHATSAPP</a>
+  </div>
+
+  <!-- 300x250 -->
   <div class="ad-300" id="ad-300"></div>
 
   <button class="unlock-ready-btn" id="unlock-ready-btn">🔓 UNLOCK &amp; GET CONFIG</button>
@@ -247,9 +252,9 @@ function loadInterstitialAds() {
   if (!w468.dataset.loaded) {
     w468.dataset.loaded = 'true';
     var s1 = document.createElement('script');
-    s1.textContent = "atOptions={'key':'6b7cdd4612a03ba105e11dde9ed808f4','format':'iframe','height':60,'width':468,'params':{}};";
+    s1.textContent = "atOptions={'key':'a63fd0dc7ea0888b1df2a07fc9dbb1d5','format':'iframe','height':50,'width':320,'params':{}};";
     var s2 = document.createElement('script');
-    s2.src = 'https://www.highperformanceformat.com/6b7cdd4612a03ba105e11dde9ed808f4/invoke.js';
+    s2.src = 'https://www.highperformanceformat.com/a63fd0dc7ea0888b1df2a07fc9dbb1d5/invoke.js';
     w468.appendChild(s1);
     w468.appendChild(s2);
   }
