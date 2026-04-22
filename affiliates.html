@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITACHI CFG DROP — Affiliates</title>
+<meta name="referrer" content="no-referrer-when-downgrade" />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#030303;--s1:#0a0a0a;--s2:#111;--border:#1a1a1a;--border2:#242424;
+  --cyan:#00e5ff;--green:#00ff87;--yellow:#ffe600;--red:#ff3b3b;
+  --text:#f0f0f0;--muted:#3a3a3a;--dim:#666;
+  --font-d:'Orbitron',sans-serif;--font-b:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);min-height:100vh;overflow-x:hidden;position:relative;}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:0 20px;}
+
+header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdrop-filter:blur(10px);position:sticky;top:0;z-index:100;}
+.header-inner{max-width:700px;margin:0 auto;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-family:var(--font-d);font-size:16px;font-weight:900;letter-spacing:4px;color:var(--cyan);}
+.logo span{color:var(--text);}
+.back-btn{font-size:10px;color:var(--dim);letter-spacing:2px;text-decoration:none;transition:color 0.15s;}
+.back-btn:hover{color:var(--cyan);}
+
+/* HERO */
+.hero{padding:40px 0 24px;text-align:center;}
+.hero-title{font-family:var(--font-d);font-size:clamp(20px,4vw,32px);font-weight:900;letter-spacing:3px;line-height:1.2;margin-bottom:8px;}
+.hero-title .highlight{color:var(--yellow);}
+.hero-sub{font-size:11px;color:var(--dim);letter-spacing:2px;}
+
+/* SETUP CARD */
+.setup-card{background:var(--s1);border:1px solid var(--border);padding:28px;margin:24px 0;position:relative;}
+.setup-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--yellow),transparent);opacity:0.6;}
+.card-label{font-size:9px;color:var(--dim);letter-spacing:3px;margin-bottom:16px;}
+.input-row{display:flex;gap:10px;margin-bottom:12px;}
+.name-input{flex:1;padding:12px;background:var(--s2);border:1px solid var(--border2);color:var(--text);font-family:var(--font-b);font-size:12px;outline:none;transition:border-color 0.15s;}
+.name-input:focus{border-color:var(--yellow);}
+.gen-btn{padding:12px 20px;font-family:var(--font-d);font-size:10px;letter-spacing:2px;font-weight:700;cursor:pointer;background:var(--yellow);color:#000;border:none;transition:all 0.15s;white-space:nowrap;}
+.gen-btn:hover{background:#fff;}
+.gen-btn:disabled{background:var(--border2);color:var(--dim);cursor:not-allowed;}
+
+/* REF LINK */
+.ref-wrap{display:none;margin-top:16px;}
+.ref-label{font-size:9px;color:var(--dim);letter-spacing:2px;margin-bottom:8px;}
+.ref-link-box{display:flex;gap:8px;align-items:center;}
+.ref-link{flex:1;padding:10px 12px;background:var(--s2);border:1px solid var(--border2);color:var(--cyan);font-family:var(--font-b);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.copy-ref-btn{padding:10px 16px;font-family:var(--font-d);font-size:9px;letter-spacing:2px;cursor:pointer;background:transparent;color:var(--cyan);border:1px solid var(--cyan);transition:all 0.15s;white-space:nowrap;}
+.copy-ref-btn:hover{background:var(--cyan);color:#000;}
+.copy-ref-btn.copied{background:var(--green);color:#000;border-color:var(--green);}
+.share-row{display:flex;gap:8px;margin-top:10px;}
+.share-btn{flex:1;padding:10px;font-family:var(--font-d);font-size:9px;letter-spacing:2px;cursor:pointer;border:none;transition:all 0.15s;font-weight:700;}
+.share-tg{background:#29A8E8;color:#fff;}
+.share-wa{background:#25D366;color:#fff;}
+.share-tg:hover{background:#1a8bc7;}
+.share-wa:hover{background:#1da851;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0;}
+.stat-box{background:var(--s1);border:1px solid var(--border);padding:16px;text-align:center;position:relative;}
+.stat-num{font-size:28px;font-weight:500;color:var(--yellow);font-family:var(--font-d);}
+.stat-label{font-size:9px;color:var(--dim);letter-spacing:1px;margin-top:4px;}
+
+/* PROGRESS */
+.progress-card{background:var(--s1);border:1px solid var(--border);padding:24px;margin:16px 0;position:relative;}
+.progress-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),transparent);opacity:0.6;}
+.progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.progress-title{font-size:10px;color:var(--dim);letter-spacing:2px;}
+.progress-count{font-size:12px;color:var(--yellow);font-weight:600;}
+.progress-bar-wrap{background:var(--border2);height:6px;border-radius:0;overflow:hidden;margin-bottom:8px;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--cyan));transition:width 0.8s ease;box-shadow:0 0 8px var(--green);}
+.progress-sub{font-size:9px;color:var(--muted);letter-spacing:1px;}
+.redeem-badge{display:none;margin-top:14px;padding:12px;background:rgba(0,255,135,0.06);border:1px solid rgba(0,255,135,0.3);text-align:center;}
+.redeem-badge-text{font-size:11px;color:var(--green);letter-spacing:2px;margin-bottom:8px;}
+.redeem-wa-btn{padding:10px 24px;font-family:var(--font-d);font-size:10px;letter-spacing:2px;cursor:pointer;background:var(--green);color:#000;border:none;font-weight:700;}
+
+/* LEADERBOARD */
+.lb-card{background:var(--s1);border:1px solid var(--border);padding:24px;margin:16px 0;}
+.lb-title{font-family:var(--font-d);font-size:11px;letter-spacing:3px;color:var(--yellow);margin-bottom:16px;}
+.lb-list{display:flex;flex-direction:column;gap:8px;}
+.lb-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--s2);border:1px solid var(--border);}
+.lb-item.me{border-color:var(--cyan);background:rgba(0,229,255,0.04);}
+.lb-rank{font-size:14px;width:28px;text-align:center;flex-shrink:0;}
+.lb-name{flex:1;font-size:12px;font-weight:500;}
+.lb-count{font-size:11px;color:var(--yellow);}
+.lb-empty{font-size:11px;color:var(--muted);text-align:center;padding:24px;}
+.lb-me-tag{font-size:8px;color:var(--cyan);letter-spacing:1px;margin-left:6px;}
+.rank-note{font-size:9px;color:var(--dim);letter-spacing:1px;margin-top:12px;text-align:center;}
+
+/* HOW IT WORKS */
+.how-card{background:var(--s1);border:1px solid var(--border);padding:24px;margin:16px 0 40px;}
+.how-title{font-size:10px;color:var(--dim);letter-spacing:3px;margin-bottom:16px;}
+.how-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px;}
+.how-num{font-family:var(--font-d);font-size:16px;color:var(--yellow);flex-shrink:0;width:24px;}
+.how-text{font-size:11px;color:var(--dim);line-height:1.6;}
+.how-text strong{color:var(--text);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--green);color:#000;padding:10px 24px;font-family:var(--font-d);font-size:10px;letter-spacing:2px;transition:transform 0.3s ease;z-index:9999;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+@media(max-width:500px){
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .input-row{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">ITACHI <span>AFFILIATES</span></div>
+    <a href="/" class="back-btn">← BACK TO CONFIGS</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-title">EARN WITH <span class="highlight">ITACHIGOAT</span></div>
+    <div class="hero-sub" style="margin-top:4px;">INVITE 100 PEOPLE · REDEEM YOUR REWARD 🐐</div>
+  </div>
+
+  <!-- SETUP / EXISTING USER -->
+  <div class="setup-card" id="setup-card">
+    <div class="card-label">GET YOUR REFERRAL LINK</div>
+    <div class="input-row">
+      <input type="text" class="name-input" id="nickname-input" placeholder="Enter your nickname (e.g. DATAKING)" maxlength="20">
+      <button class="gen-btn" id="gen-btn" onclick="generateCode()">GET LINK</button>
+    </div>
+    <div style="font-size:9px;color:var(--muted);letter-spacing:1px;">Already have a code? Enter your nickname to retrieve it.</div>
+
+    <div class="ref-wrap" id="ref-wrap">
+      <div class="ref-label">YOUR REFERRAL LINK</div>
+      <div class="ref-link-box">
+        <div class="ref-link" id="ref-link-display">—</div>
+        <button class="copy-ref-btn" id="copy-ref-btn" onclick="copyRefLink()">COPY</button>
+      </div>
+      <div class="share-row">
+        <button class="share-btn share-tg" onclick="shareTelegram()">✈️ SHARE ON TELEGRAM</button>
+        <button class="share-btn share-wa" onclick="shareWhatsapp()">💬 SHARE ON WHATSAPP</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div id="stats-section" style="display:none;">
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-num" id="stat-valid">0</div>
+        <div class="stat-label">VALID REFERRALS</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="stat-pending">0</div>
+        <div class="stat-label">PENDING</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="stat-needed">100</div>
+        <div class="stat-label">TARGET</div>
+      </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="progress-card">
+      <div class="progress-top">
+        <div class="progress-title">PROGRESS TO REWARD</div>
+        <div class="progress-count"><span id="prog-count">0</span> / 100</div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-sub" id="progress-sub">Invite 100 valid users to unlock your reward</div>
+      <div class="redeem-badge" id="redeem-badge">
+        <div class="redeem-badge-text">🎉 YOU HIT 100 — CLAIM YOUR REWARD</div>
+        <button class="redeem-wa-btn" onclick="redeemReward()">💬 REDEEM ON WHATSAPP</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="lb-card">
+    <div class="lb-title">🏆 TOP AFFILIATES</div>
+    <div class="lb-list" id="lb-list">
+      <div class="lb-empty">Loading leaderboard...</div>
+    </div>
+    <div class="rank-note" id="rank-note"></div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-card">
+    <div class="how-title">HOW IT WORKS</div>
+    <div class="how-step">
+      <div class="how-num">01</div>
+      <div class="how-text"><strong>Get your link</strong> — enter a nickname and copy your unique referral link</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">02</div>
+      <div class="how-text"><strong>Share it</strong> — post on WhatsApp, Telegram, TikTok, anywhere</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">03</div>
+      <div class="how-text"><strong>They visit</strong> — your link must stay open for <strong>45 seconds</strong> to count as valid. Quick bounces don't count.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">04</div>
+      <div class="how-text"><strong>Hit 100</strong> — reach 100 valid referrals and WhatsApp us to claim your reward 🐐</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">⚠️</div>
+      <div class="how-text" style="color:var(--red);">Same device, same IP, or visits under 45 seconds do <strong>NOT</strong> count. No farming.</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var SUPABASE_URL      = 'https://lkruzhkjultgappbhwvq.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxrcnV6aGtqdWx0Z2FwcGJod3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2Nzg3MTQsImV4cCI6MjA5MTI1NDcxNH0.qSxwE01YLfjG28jV7YKJQsiM1HIar9JCOaJKvmMhfq0';
+var db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+var SITE_URL    = 'https://cfg.itachigoat.co.za';
+var WA_REDEEM  = 'https://chat.whatsapp.com/HDGKhy2BgOv3kmBl9hqQ4Q';
+var TG_CHANNEL = 'https://t.me/baywaveinternet';
+var TARGET     = 100;
+
+var myRefCode  = null;
+var myNickname = null;
+
+// ── TOAST
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+// ── GENERATE OR RETRIEVE CODE
+async function generateCode() {
+  var nickname = document.getElementById('nickname-input').value.trim().toUpperCase().replace(/[^A-Z0-9_]/g,'');
+  if (!nickname || nickname.length < 2) { showToast('Enter a valid nickname'); return; }
+
+  var btn = document.getElementById('gen-btn');
+  btn.disabled = true; btn.textContent = 'LOADING...';
+
+  // Check if nickname already exists
+  var existing = await db.from('affiliates').select('*').eq('nickname', nickname).single();
+
+  if (existing.data) {
+    // Retrieve existing
+    myRefCode  = existing.data.ref_code;
+    myNickname = existing.data.nickname;
+    localStorage.setItem('aff_ref_code',  myRefCode);
+    localStorage.setItem('aff_nickname',  myNickname);
+    showRefLink();
+    loadMyStats(existing.data);
+    btn.disabled = false; btn.textContent = 'GET LINK';
+    showToast('Welcome back ' + myNickname + '!');
+    return;
+  }
+
+  // Create new
+  var newCode = nickname + '_' + Math.random().toString(36).substr(2,5).toUpperCase();
+  var res = await db.from('affiliates').insert({
+    ref_code: newCode,
+    nickname: nickname,
+    valid_referrals: 0
+  }).select().single();
+
+  if (res.error) {
+    showToast('Error — try a different nickname');
+    btn.disabled = false; btn.textContent = 'GET LINK';
+    return;
+  }
+
+  myRefCode  = newCode;
+  myNickname = nickname;
+  localStorage.setItem('aff_ref_code', myRefCode);
+  localStorage.setItem('aff_nickname', myNickname);
+  showRefLink();
+  loadMyStats(res.data);
+  btn.disabled = false; btn.textContent = 'GET LINK';
+  showToast('Link generated — start sharing!');
+}
+
+function showRefLink() {
+  var link = SITE_URL + '?ref=' + myRefCode;
+  document.getElementById('ref-link-display').textContent = link;
+  document.getElementById('ref-wrap').style.display = 'block';
+  document.getElementById('stats-section').style.display = 'block';
+  document.getElementById('nickname-input').value = myNickname;
+}
+
+function loadMyStats(data) {
+  var valid   = data.valid_referrals || 0;
+  var pct     = Math.min((valid / TARGET) * 100, 100);
+  var needed  = Math.max(TARGET - valid, 0);
+
+  document.getElementById('stat-valid').textContent   = valid;
+  document.getElementById('stat-pending').textContent = '—';
+  document.getElementById('stat-needed').textContent  = TARGET;
+  document.getElementById('prog-count').textContent   = valid;
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  if (valid >= TARGET) {
+    document.getElementById('progress-sub').textContent = '🎉 Target reached — claim your reward!';
+    document.getElementById('redeem-badge').style.display = 'block';
+  } else {
+    document.getElementById('progress-sub').textContent = needed + ' more valid referrals to unlock your reward';
+  }
+}
+
+// ── COPY LINK
+function copyRefLink() {
+  var link = SITE_URL + '?ref=' + myRefCode;
+  var btn  = document.getElementById('copy-ref-btn');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link).then(function() {
+      btn.textContent = 'COPIED!'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent='COPY'; btn.classList.remove('copied'); }, 2000);
+    });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = link; ta.style.cssText='position:fixed;opacity:0;';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = 'COPIED!'; btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent='COPY'; btn.classList.remove('copied'); }, 2000);
+  }
+}
+
+// ── SHARE
+function shareTelegram() {
+  var link = SITE_URL + '?ref=' + myRefCode;
+  var text = encodeURIComponent('🐐 Get free premium VPN configs from ItachiGoat!\n\nUse my link and we both win:\n' + link + '\n\nWorks on ZiVPN · NVP · TLS Tunnel 🔥');
+  window.open('https://t.me/share/url?url=' + encodeURIComponent(link) + '&text=' + text, '_blank');
+}
+
+function shareWhatsapp() {
+  var link = SITE_URL + '?ref=' + myRefCode;
+  var text = encodeURIComponent('🐐 Free premium VPN configs from ItachiGoat 🔥\n\nWorks on ZiVPN, NVP, TLS Tunnel\nNo signup. No limits.\n\n👇 Get yours:\n' + link);
+  window.open('https://wa.me/?text=' + text, '_blank');
+}
+
+// ── REDEEM
+function redeemReward() {
+  var text = encodeURIComponent('Hi ItachiGoat! I reached 100 referrals on the affiliate program. My code is: ' + myRefCode + ' — nickname: ' + myNickname);
+  window.open('https://wa.me/+27000000000?text=' + text, '_blank');
+}
+
+// ── LEADERBOARD
+async function loadLeaderboard() {
+  var res = await db.from('affiliates')
+    .select('nickname, ref_code, valid_referrals')
+    .order('valid_referrals', { ascending: false })
+    .limit(10);
+
+  var list = document.getElementById('lb-list');
+  if (res.error || !res.data || !res.data.length) {
+    list.innerHTML = '<div class="lb-empty">No referrals yet — be the first 🐐</div>';
+    return;
+  }
+
+  var medals = ['🥇','🥈','🥉'];
+  var myRank  = -1;
+  var html    = '';
+
+  res.data.forEach(function(row, i) {
+    var isMe = row.ref_code === myRefCode;
+    if (isMe) myRank = i + 1;
+    var medal = medals[i] || (i + 1) + '.';
+    html += '<div class="lb-item' + (isMe?' me':'') + '">'
+      + '<div class="lb-rank">' + medal + '</div>'
+      + '<div class="lb-name">' + row.nickname + (isMe?'<span class="lb-me-tag">(YOU)</span>':'') + '</div>'
+      + '<div class="lb-count">' + (row.valid_referrals||0) + ' invites</div>'
+      + '</div>';
+  });
+
+  list.innerHTML = html;
+
+  // Show rank note
+  if (myRefCode && myRank > 0) {
+    document.getElementById('rank-note').textContent = 'You are ranked #' + myRank;
+  } else if (myRefCode && myRank === -1) {
+    document.getElementById('rank-note').textContent = 'Keep going — you\'re not in the top 10 yet';
+  }
+}
+
+// ── AUTO RESTORE SESSION
+async function restoreSession() {
+  var savedCode = localStorage.getItem('aff_ref_code');
+  var savedNick = localStorage.getItem('aff_nickname');
+  if (!savedCode || !savedNick) return;
+  var res = await db.from('affiliates').select('*').eq('ref_code', savedCode).single();
+  if (res.data) {
+    myRefCode  = savedCode;
+    myNickname = savedNick;
+    document.getElementById('nickname-input').value = savedNick;
+    showRefLink();
+    loadMyStats(res.data);
+  }
+}
+
+// ── REALTIME LEADERBOARD
+function subscribeLeaderboard() {
+  db.channel('lb-realtime')
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'affiliates'
+    }, function() {
+      loadLeaderboard();
+      // Refresh own stats too
+      if (myRefCode) {
+        db.from('affiliates').select('*').eq('ref_code', myRefCode).single().then(function(r){
+          if (r.data) loadMyStats(r.data);
+        });
+      }
+    })
+    .subscribe();
+}
+
+restoreSession();
+loadLeaderboard();
+subscribeLeaderboard();
+</script>
+</body>
+</html>
