@@ -241,20 +241,27 @@ function showToast(msg) {
 // ── GENERATE OR RETRIEVE CODE
 async function generateCode() {
   var nickname = document.getElementById('nickname-input').value.trim().toUpperCase().replace(/[^A-Z0-9_]/g,'');
+  var pin      = document.getElementById('pin-input').value.trim();
   if (!nickname || nickname.length < 2) { showToast('Enter a valid nickname'); return; }
+  if (!pin || pin.length < 4) { showToast('Enter a 4-digit PIN'); return; }
 
   var btn = document.getElementById('gen-btn');
   btn.disabled = true; btn.textContent = 'LOADING...';
 
-  // Check if nickname already exists
   var existing = await db.from('affiliates').select('*').eq('nickname', nickname).single();
 
   if (existing.data) {
-    // Retrieve existing
+    // Check PIN matches
+    if (existing.data.pin !== pin) {
+      showToast('Wrong PIN — try again');
+      btn.disabled = false; btn.textContent = 'GET LINK';
+      return;
+    }
     myRefCode  = existing.data.ref_code;
     myNickname = existing.data.nickname;
-    localStorage.setItem('aff_ref_code',  myRefCode);
-    localStorage.setItem('aff_nickname',  myNickname);
+    localStorage.setItem('aff_ref_code', myRefCode);
+    localStorage.setItem('aff_nickname', myNickname);
+    localStorage.setItem('aff_pin', pin);
     showRefLink();
     loadMyStats(existing.data);
     btn.disabled = false; btn.textContent = 'GET LINK';
@@ -267,6 +274,7 @@ async function generateCode() {
   var res = await db.from('affiliates').insert({
     ref_code: newCode,
     nickname: nickname,
+    pin: pin,
     valid_referrals: 0
   }).select().single();
 
@@ -280,6 +288,7 @@ async function generateCode() {
   myNickname = nickname;
   localStorage.setItem('aff_ref_code', myRefCode);
   localStorage.setItem('aff_nickname', myNickname);
+  localStorage.setItem('aff_pin', pin);
   showRefLink();
   loadMyStats(res.data);
   btn.disabled = false; btn.textContent = 'GET LINK';
@@ -393,8 +402,9 @@ async function loadLeaderboard() {
 async function restoreSession() {
   var savedCode = localStorage.getItem('aff_ref_code');
   var savedNick = localStorage.getItem('aff_nickname');
-  if (!savedCode || !savedNick) return;
-  var res = await db.from('affiliates').select('*').eq('ref_code', savedCode).single();
+  var savedPin  = localStorage.getItem('aff_pin');
+  if (!savedCode || !savedNick || !savedPin) return;
+  var res = await db.from('affiliates').select('*').eq('ref_code', savedCode).eq('pin', savedPin).single();
   if (res.data) {
     myRefCode  = savedCode;
     myNickname = savedNick;
