@@ -10,6 +10,9 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JA==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+/* Ad blocker detection element */
+.ad-detect{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;}
+
 :root{
   --bg:#030303;--s1:#0a0a0a;--s2:#111;--border:#1a1a1a;--border2:#242424;
   --cyan:#00e5ff;--green:#00ff87;--yellow:#ffe600;--red:#ff3b3b;
@@ -119,6 +122,24 @@ footer{border-top:1px solid var(--border);padding:24px 0 20px;text-align:center;
 </style>
 </head>
 <body>
+
+<!-- Ad Blocker Detection -->
+<div class="ad-detect ads adsbygoogle" id="ad-detect"></div>
+
+<div id="adblock-wall" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:9999;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;">
+  <div style="font-family:var(--font-d);font-size:24px;color:var(--red);margin-bottom:16px;">⚠️</div>
+  <div style="font-family:var(--font-d);font-size:14px;letter-spacing:3px;color:var(--text);margin-bottom:12px;">AD BLOCKER DETECTED</div>
+  <div style="font-size:11px;color:var(--dim);letter-spacing:1px;line-height:1.8;margin-bottom:24px;">
+    This site is 100% free — ads keep it running.<br>
+    Please disable your ad blocker to access configs.
+  </div>
+  <div style="font-size:10px;color:var(--muted);margin-bottom:24px;">
+    ✅ Disable ad blocker → refresh the page
+  </div>
+  <button onclick="checkAdBlock()" style="padding:14px 32px;font-family:var(--font-d);font-size:11px;letter-spacing:3px;font-weight:700;cursor:pointer;background:var(--cyan);color:#000;border:none;">
+    I DISABLED IT — CONTINUE
+  </button>
+</div>
 
 <header>
   <div class="header-inner">
@@ -272,6 +293,18 @@ function loadInterstitialAds() {
 
 // ── LOAD CONFIGS
 async function loadConfigs() {
+  // Block load if ad blocker is active
+  var el = document.getElementById('ad-detect');
+  var isBlocked = !el || el.offsetHeight === 0 || el.offsetParent === null ||
+    window.getComputedStyle(el).display === 'none' ||
+    window.getComputedStyle(el).visibility === 'hidden';
+
+  if (isBlocked) {
+    document.getElementById('adblock-wall').style.display = 'flex';
+    document.getElementById('config-grid').innerHTML = '';
+    return;
+  }
+
   var grid = document.getElementById('config-grid');
   var res  = await db.from('Configs').select('*').order('created_at', { ascending: false });
   if (res.error || !res.data) {
@@ -279,7 +312,6 @@ async function loadConfigs() {
     return;
   }
   allConfigs = res.data;
-  // Build cloudTextMap from raw data — survives all re-renders
   allConfigs.forEach(function(cfg) {
     if (cfg.config_text) cloudTextMap[cfg.id] = cfg.config_text;
   });
