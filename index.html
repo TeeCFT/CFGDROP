@@ -10,44 +10,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JA==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "e8570777-dace-4284-b39c-351bc509b7a3",
-
-      // Disable auto prompt (we control timing)
-      promptOptions: {
-        slidedown: {
-          enabled: false
-        }
-      }
-    });
-  });
-
-  // ─────────────────────────────
-  // SMART PROMPT SYSTEM
-  // ─────────────────────────────
-
-  let pushPromptShown = false;
-
-  function triggerPushPrompt() {
-    if (pushPromptShown) return;
-
-    pushPromptShown = true;
-
-    window.OneSignalDeferred.push(function(OneSignal) {
-      OneSignal.Slidedown.promptPush();
-    });
-  }
-
-  // 1️⃣ Time-based trigger (8s after load)
-  setTimeout(() => {
-    triggerPushPrompt();
-  }, 8000);
-
-</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <style>
 /* Ad blocker detection element */
 .ad-detect{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;}
@@ -578,6 +542,58 @@ async function incrementDownloads(id) {
 }
 
 loadConfigs();
+
+// ===== FIREBASE PUSH SETUP =====
+
+// 1. INIT FIREBASE
+const firebaseConfig = {
+  apiKey: "AIzaSyApRWVmBpN-CoIU8IauJjpTvzObD4cTb9o",
+  authDomain: "cfgdrop-3e45e.firebaseapp.com",
+  projectId: "cfgdrop-3e45e",
+  messagingSenderId: "1060676126298",
+  appId: "1:1060676126298:web:f78434290bffc671ea7a63"
+};
+
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
+
+// 2. REGISTER SERVICE WORKER
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/firebase-messaging-sw.js")
+    .then(() => console.log("Service Worker Registered"))
+    .catch(err => console.log("SW error:", err));
+}
+
+// 3. REQUEST PERMISSION + GET TOKEN
+async function enablePush() {
+  try {
+    const permission = await Notification.requestPermission();
+
+    if (permission !== "granted") {
+      console.log("Push blocked");
+      return;
+    }
+
+    const token = await messaging.getToken({
+      vapidKey: "BMUrB7nXE45Fh9gEW0Y_oEs4su10o-A4yfQrAGyUMgvRRUKG5hLKg_Vjuf4n8NKwDODA_dFPwkAaP9CBpA0QKFI"
+    });
+
+    console.log("🔥 FCM TOKEN:", token);
+
+    // NEXT PHASE: send token to Supabase
+
+  } catch (err) {
+    console.log("Push error:", err);
+  }
+}
+
+// 4. AUTO TRIGGER AFTER PAGE LOAD
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    enablePush();
+  }, 3000);
+});
+  
 </script>
 
 <!-- HilltopAds Video Slider -->
