@@ -6,7 +6,7 @@ export async function handler(event, context) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Basic ${os_v2_app_5blqo562zzbijm44gun4kcnxup7vugn7zexuchfqsbz62anxdxujhahnwkehxbac4k2spx6p4jepbz7q7m5azuulcool43qohxshlua}`
+        "Authorization": `Basic ${ONESIGNAL_API_KEY}`
       },
       body: JSON.stringify({
         app_id: "e8570777-dace-4284-b39c-351bc509b7a3",
