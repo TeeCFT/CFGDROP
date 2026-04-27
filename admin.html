@@ -17,7 +17,7 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:var(--font-b);min-height:100vh;}
-body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.02) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.02) 1px,transparent 1px);background-size:100% 100%;pointer-events:none;}
 
 #login-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;}
 .login-box{width:100%;max-width:380px;padding:40px;background:var(--s1);border:1px solid var(--border);position:relative;}
@@ -43,7 +43,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 .nav-item:hover{color:var(--text);background:rgba(255,255,255,0.02);}
 .nav-item.active{color:var(--cyan);border-left-color:var(--cyan);background:rgba(0,229,255,0.04);}
 .nav-icon{font-size:14px;width:20px;text-align:center;}
-.logout-btn{padding:16px 20px;font-size:10px;color:var(--dim);cursor:pointer;border-top:1px solid var(--border);border-bottom:none;border-left:none;border-right:none;font-family:var(--font-b);text-align:left;width:100%;background:none;transition:color 0.15s;}
+.logout-btn{padding:16px 20px;font-size:10px;color:var(--dim);cursor:pointer;border-top:1px solid var(--border);border-bottom:none;border-left:none;border-right:none;font-family:var(--font-b);text-align:left;transition:all 0.15s;}
 .logout-btn:hover{color:var(--red);}
 .main{margin-left:200px;padding:32px;min-height:100vh;}
 .panel{display:none;}.panel.active{display:block;}
@@ -55,7 +55,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
 .form-row.full{grid-template-columns:1fr;}
 .form-group label{display:block;font-size:10px;color:var(--dim);letter-spacing:2px;margin-bottom:6px;}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;background:var(--s2);border:1px solid var(--border2);color:var(--text);font-family:var(--font-b);font-size:12px;outline:none;transition:border-color 0.15s;resize:vertical;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;background:var(--s2);border:1px solid var(--border2);color:var(--text);font-family:var(--font-b);font-size:12px;outline:none;transition:border-color 0.15s;}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--cyan);}
 .form-group select option{background:var(--s1);}
 .drop-zone{border:1px dashed var(--border2);padding:32px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;}
@@ -258,7 +258,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 
 <script>
 const SUPABASE_URL      = 'https://lkruzhkjultgappbhwvq.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxrcnV6aGtqdWx0Z2FwcGJod3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2Nzg3MTQsImV4cCI6MjA5MTI1NDcxNH0.qSxwE01YLfjG28jV7YKJQsiM1HIar9JCOaJKvmMhfq0';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxrcnV6aGtqdWx0Z2FwcGJod3ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2Nzg3MTQsImV4cCI6MjA5MTI1NDcxNH0.qSxwE01Y';
 const UC_PUBLIC_KEY = '2588098b498dce524a55';
 const UC_UPLOAD_URL = 'https://upload.uploadcare.com/base/';
 const UC_CDN_BASE   = 'https://ucarecdn.com/';
@@ -290,6 +290,7 @@ function bootApp(email) {
   document.getElementById('sidebar-user').textContent = email;
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
+  await fetch("/.netlify/functions/push");
   loadManage();
 }
 document.getElementById('login-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
@@ -498,8 +499,8 @@ async function deleteConfig(id, fileUUID) {
 }
 
 // ── TREND INTEL
-const NORTH_CONTEXT = 'You are the content intelligence system for North — a young South African creator, entrepreneur, forex trader, and music producer building the NDS (North Dream Studio) brand. Niches: forex, music production, startups/apps, street culture, fashion, South African culture, cinematic storytelling, entrepreneurship. YouTube growth is #1 priority in 2026.';
-const SUBREDDITS = ['streetwear','sneakers','hiphopheads','artificial','startups','SideProject','MachineLearning','Daytrading','Forex','entrepreneur','WeAreTheMusicMakers','makinghiphop','OutOfTheLoop','InternetIsBeautiful','futurology','TikTokCringe'];
+const NORTH_CONTEXT = 'You are the content intelligence system for North — a young South African creator, entrepreneur, forex trader, and music producer building the NDS (North Dream Studio) brand.';
+const SUBREDDITS = ['streetwear','sneakers','hiphopheads','artificial','startups','SideProject','MachineLearning','Daytrading','Forex','entrepreneur','WeAreTheMusicMakers','makinghiphop','OutOfTheLoop'];
 const NEWS_FEEDS = [
   {name:'TechCrunch',url:'https://techcrunch.com/feed/'},
   {name:'Rolling Stone',url:'https://www.rollingstone.com/feed/'},
@@ -524,7 +525,7 @@ async function fetchHN() {
     var res   = await fetch(PROXY+encodeURIComponent('https://hacker-news.firebaseio.com/v0/newstories.json'));
     var json  = await res.json();
     var ids   = JSON.parse(json.contents).slice(0,20);
-    var stories = await Promise.all(ids.slice(0,10).map(function(id){ return fetch(PROXY+encodeURIComponent('https://hacker-news.firebaseio.com/v0/item/'+id+'.json')).then(function(r){ return r.json(); }).then(function(j){ return JSON.parse(j.contents); }).catch(function(){ return null; }); }));
+    var stories = await Promise.all(ids.slice(0,10).map(function(id){ return fetch(PROXY+encodeURIComponent('https://hacker-news.firebaseio.com/v0/item/'+id+'.json')).then(function(r){ return r.json(); }); }));
     return stories.filter(Boolean).filter(function(s){ return s?.title; }).map(function(s){ return {title:s.title,score:s.score||0,source:'HackerNews',type:'hn'}; });
   } catch { return []; }
 }
@@ -577,7 +578,7 @@ async function runBrief() {
   for (var j=0; j<NEWS_FEEDS.length; j++) { var a=await fetchNews(NEWS_FEEDS[j]); signals=signals.concat(a); if(a.length) addLog('  ✓ '+NEWS_FEEDS[j].name+' ('+a.length+')'); }
   addLog('→ '+signals.length+' signals — running AI...');
   try {
-    var res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:NORTH_CONTEXT+'\n\nRaw signals:\n'+JSON.stringify(signals.slice(0,60),null,2)+'\n\nIdentify TOP 8 pre-mainstream trends. Return ONLY a valid JSON array, no markdown:\n[{"trend_name":"...","category":"Tech|Culture|Music|Fashion|Finance|Forex","velocity_score":75,"urgency":"Post today|This week|Within 2 weeks","why_rising":"...","mainstream_eta":"...","sources_detected":["..."],"youtube_angle":{"format":"Short|Long-form|Both","title":"...","hook":"...","why_now":"..."},"tiktok_hook":"...","instagram_angle":"..."}]\n\nYouTube growth is #1. Sort by urgency then velocity. Return exactly 8.'}]})});
+    var res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:NORTH_CONTEXT+' Analyze these signals and return ONLY valid JSON (no markdown, no code blocks): '+JSON.stringify(signals)}]})});
     var data = await res.json();
     var text = (data.content||[]).map(function(b){ return b.text||''; }).join('');
     allTrends = JSON.parse(text.replace(/```json|```/g,'').trim());
@@ -624,8 +625,8 @@ function renderTrends(trends) {
       +'<div><div class="expand-label" style="color:var(--dim)">◈ TIKTOK</div><div class="expand-field-val">'+(t.tiktok_hook||'—')+'</div></div>'
       +'<div><div class="expand-label" style="color:var(--dim)">◉ INSTAGRAM</div><div class="expand-field-val">'+(t.instagram_angle||'—')+'</div></div>'
       +'</div>'
-      +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">'+(t.sources_detected||[]).map(function(s){ return '<span style="font-size:9px;color:var(--muted);border:1px solid var(--border);padding:2px 6px">'+s+'</span>'; }).join('')+'</div>'
-      +'</div></div>';
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">'+(t.sources_detected||[]).map(function(s){ return '<span style="font-size:9px;color:var(--muted);border:1px solid var(--border2);padding:2px 6px">'+s+'</span>'; }).join('')+'</div>'
+      +'</div>';
   }).join('');
 }
 
