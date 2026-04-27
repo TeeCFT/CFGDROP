@@ -580,7 +580,13 @@ async function enablePush() {
 
     console.log("🔥 FCM TOKEN:", token);
 
-    // NEXT PHASE: send token to Supabase
+// Save to Supabase
+    await db.from("push_tokens").upsert({
+    token: token,
+    created_at: new Date().toISOString()
+});
+   
+// NEXT PHASE: send token to Supabase
 
   } catch (err) {
     console.log("Push error:", err);
