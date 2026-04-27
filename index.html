@@ -9,6 +9,46 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JA==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "e8570777-dace-4284-b39c-351bc509b7a3",
+
+      // Disable auto prompt (we control timing)
+      promptOptions: {
+        slidedown: {
+          enabled: false
+        }
+      }
+    });
+  });
+
+  // ─────────────────────────────
+  // SMART PROMPT SYSTEM
+  // ─────────────────────────────
+
+  let pushPromptShown = false;
+
+  function triggerPushPrompt() {
+    if (pushPromptShown) return;
+
+    pushPromptShown = true;
+
+    window.OneSignalDeferred.push(function(OneSignal) {
+      OneSignal.Slidedown.promptPush();
+    });
+  }
+
+  // 1️⃣ Time-based trigger (8s after load)
+  setTimeout(() => {
+    triggerPushPrompt();
+  }, 8000);
+
+</script>
 <style>
 /* Ad blocker detection element */
 .ad-detect{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;}
