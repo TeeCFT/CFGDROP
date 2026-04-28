@@ -253,17 +253,12 @@ footer{border-top:1px solid var(--border);padding:24px 0 20px;text-align:center;
   <button class="nudge-btn" style="margin-top:8px;border-color:var(--yellow);color:var(--yellow);" onclick="openRequest()">📡 REQUEST A CONFIG</button>
 </div>
 
-<!-- REQUEST MODAL -->
+<!-- REQUEST MODAL — own layer, outside interstitial -->
 <div id="req-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:2000;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;overflow-y:auto;">
   <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,230,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,230,0,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;"></div>
   <div style="font-family:var(--font-d);font-size:11px;letter-spacing:4px;color:var(--dim);margin-bottom:24px;">ITACHI CFG DROP · <span style="color:var(--yellow);">CONFIG REQUEST</span></div>
-
-  <!-- Ad inside request modal -->
-  <div style="display:flex;justify-content:center;margin-bottom:20px;min-height:50px;">
-    <script type="text/javascript">atOptions={'key':'a63fd0dc7ea0888b1df2a07fc9dbb1d5','format':'iframe','height':50,'width':320,'params':{}};</script>
-    <script type="text/javascript" src="https://www.highperformanceformat.com/a63fd0dc7ea0888b1df2a07fc9dbb1d5/invoke.js"></script>
-  </div>
-
+  <!-- Ad injected when modal opens via loadRequestAd() -->
+  <div id="req-ad" style="display:flex;justify-content:center;margin-bottom:20px;min-height:50px;"></div>
   <div style="font-size:10px;color:var(--dim);letter-spacing:2px;margin-bottom:16px;">SELECT YOUR NETWORK</div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;">
     <button onclick="selectNetwork(this,'MTN')" class="req-btn">MTN</button>
@@ -271,20 +266,18 @@ footer{border-top:1px solid var(--border);padding:24px 0 20px;text-align:center;
     <button onclick="selectNetwork(this,'Vodacom')" class="req-btn">VODACOM</button>
     <button onclick="selectNetwork(this,'Cell C')" class="req-btn">CELL C</button>
   </div>
-
   <div style="font-size:10px;color:var(--dim);letter-spacing:2px;margin-bottom:16px;">SELECT YOUR APP</div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:24px;">
     <button onclick="selectApp(this,'ZiVPN')" class="req-btn">ZiVPN</button>
-    <button onclick="selectApp(this,'NVP')" class="req-btn">NPV</button>
+    <button onclick="selectApp(this,'NVP')" class="req-btn">NVP</button>
     <button onclick="selectApp(this,'TLS')" class="req-btn">TLS</button>
   </div>
-
   <button onclick="submitRequest()" id="submit-req-btn" style="width:100%;max-width:320px;padding:14px;font-family:var(--font-d);font-size:11px;letter-spacing:2px;font-weight:700;cursor:pointer;background:var(--yellow);color:#000;border:none;margin-bottom:8px;">
     📡 SUBMIT REQUEST
   </button>
   <div id="req-status" style="font-size:10px;margin-top:8px;letter-spacing:1px;display:none;text-align:center;"></div>
   <button onclick="closeRequest()" style="margin-top:16px;font-size:10px;color:var(--muted);letter-spacing:1px;background:none;border:none;cursor:pointer;">← BACK</button>
- </div>
+</div>
 </div>
 
 <script>
