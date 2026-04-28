@@ -80,6 +80,12 @@ header{border-bottom:1px solid var(--border);background:rgba(3,3,3,0.95);backdro
 .unlock-btn.cloud{background:var(--yellow);}
 .unlock-btn.cloud:hover{background:#fff;box-shadow:0 0 24px rgba(255,230,0,0.4);}
 
+/* REQUEST BUTTONS */
+.req-btn{padding:6px 12px;font-family:var(--font-d);font-size:9px;letter-spacing:1px;cursor:pointer;background:transparent;color:var(--dim);border:1px solid var(--border2);transition:all 0.15s;}
+.req-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.req-btn.selected{background:var(--cyan);color:#000;border-color:var(--cyan);}
+.req-btn.selected-yellow{background:var(--yellow);color:#000;border-color:var(--yellow);}
+
 .loading{text-align:center;padding:80px 0;color:var(--dim);font-size:11px;letter-spacing:2px;}
 .loading-dot{display:inline-block;animation:blink 1s infinite;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
@@ -242,10 +248,44 @@ footer{border-top:1px solid var(--border);padding:24px 0 20px;text-align:center;
 
   <button class="unlock-ready-btn" id="unlock-ready-btn">🔓 UNLOCK &amp; GET CONFIG</button>
   <div class="inter-skip" id="inter-skip">Please wait <span id="skip-num">20</span>s...</div>
-  <div class="nudge" id="nudge">
-    <div class="nudge-text">✓ Config unlocked — want more?</div>
-    <button class="nudge-btn" onclick="closeInterstitial()">↩ SEE MORE CONFIGS</button>
+<div class="nudge" id="nudge">
+  <div class="nudge-text">✓ Config unlocked — want more?</div>
+  <button class="nudge-btn" onclick="closeInterstitial()">↩ SEE MORE CONFIGS</button>
+  <button class="nudge-btn" style="margin-top:8px;border-color:var(--yellow);color:var(--yellow);" onclick="openRequest()">📡 REQUEST A CONFIG</button>
+</div>
+
+<!-- REQUEST MODAL -->
+<div id="req-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:2000;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;overflow-y:auto;">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,230,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,230,0,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;"></div>
+  <div style="font-family:var(--font-d);font-size:11px;letter-spacing:4px;color:var(--dim);margin-bottom:24px;">ITACHI CFG DROP · <span style="color:var(--yellow);">CONFIG REQUEST</span></div>
+
+  <!-- Ad inside request modal -->
+  <div style="display:flex;justify-content:center;margin-bottom:20px;min-height:50px;">
+    <script type="text/javascript">atOptions={'key':'a63fd0dc7ea0888b1df2a07fc9dbb1d5','format':'iframe','height':50,'width':320,'params':{}};</script>
+    <script type="text/javascript" src="https://www.highperformanceformat.com/a63fd0dc7ea0888b1df2a07fc9dbb1d5/invoke.js"></script>
   </div>
+
+  <div style="font-size:10px;color:var(--dim);letter-spacing:2px;margin-bottom:16px;">SELECT YOUR NETWORK</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;">
+    <button onclick="selectNetwork(this,'MTN')" class="req-btn">MTN</button>
+    <button onclick="selectNetwork(this,'Telkom')" class="req-btn">TELKOM</button>
+    <button onclick="selectNetwork(this,'Vodacom')" class="req-btn">VODACOM</button>
+    <button onclick="selectNetwork(this,'Cell C')" class="req-btn">CELL C</button>
+  </div>
+
+  <div style="font-size:10px;color:var(--dim);letter-spacing:2px;margin-bottom:16px;">SELECT YOUR APP</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:24px;">
+    <button onclick="selectApp(this,'ZiVPN')" class="req-btn">ZiVPN</button>
+    <button onclick="selectApp(this,'NVP')" class="req-btn">NVP</button>
+    <button onclick="selectApp(this,'TLS')" class="req-btn">TLS</button>
+  </div>
+
+  <button onclick="submitRequest()" id="submit-req-btn" style="width:100%;max-width:320px;padding:14px;font-family:var(--font-d);font-size:11px;letter-spacing:2px;font-weight:700;cursor:pointer;background:var(--yellow);color:#000;border:none;margin-bottom:8px;">
+    📡 SUBMIT REQUEST
+  </button>
+  <div id="req-status" style="font-size:10px;margin-top:8px;letter-spacing:1px;display:none;text-align:center;"></div>
+  <button onclick="closeRequest()" style="margin-top:16px;font-size:10px;color:var(--muted);letter-spacing:1px;background:none;border:none;cursor:pointer;">← BACK</button>
+ </div>
 </div>
 
 <script>
@@ -517,6 +557,107 @@ function copySuccess(btn) {
 function showNudge() {
   document.getElementById('unlock-ready-btn').style.display = 'none';
   document.getElementById('nudge').style.display = 'block';
+}
+
+var selectedNetwork = null;
+var selectedApp     = null;
+
+function openRequest() {
+  selectedNetwork = null;
+  selectedApp     = null;
+  document.getElementById('req-status').style.display = 'none';
+  document.getElementById('submit-req-btn').textContent = '📡 SUBMIT REQUEST';
+  // Reset buttons
+  document.querySelectorAll('.req-btn').forEach(function(b){
+    b.classList.remove('selected','selected-yellow');
+  });
+  document.getElementById('req-modal').style.display = 'flex';
+}
+
+function closeRequest() {
+  document.getElementById('req-modal').style.display = 'none';
+}
+
+function selectNetwork(btn, network) {
+  selectedNetwork = network;
+  document.querySelectorAll('.req-btn').forEach(function(b){
+    if (['MTN','TELKOM','VODACOM','CELL C'].indexOf(b.textContent) !== -1) {
+      b.classList.remove('selected');
+    }
+  });
+  btn.classList.add('selected');
+}
+
+function selectApp(btn, app) {
+  selectedApp = app;
+  document.querySelectorAll('.req-btn').forEach(function(b){
+    if (['ZiVPN','NVP','TLS'].indexOf(b.textContent) !== -1) {
+      b.classList.remove('selected-yellow');
+    }
+  });
+  btn.classList.add('selected-yellow');
+}
+
+async function submitRequest() {
+  if (!selectedNetwork) { 
+    var s = document.getElementById('req-status');
+    s.style.display = 'block'; s.style.color = 'var(--red)';
+    s.textContent = '✗ Select a network first'; return; 
+  }
+  if (!selectedApp) { 
+    var s = document.getElementById('req-status');
+    s.style.display = 'block'; s.style.color = 'var(--red)';
+    s.textContent = '✗ Select an app first'; return; 
+  }
+
+  var btn = document.getElementById('submit-req-btn');
+  btn.disabled = true; btn.textContent = 'SUBMITTING...';
+
+  // Check if same visitor already requested same network+app today
+  var visitorId = localStorage.getItem('cfg_visitor_id') || 'anon';
+  var todayKey  = 'req_' + selectedNetwork + '_' + selectedApp + '_' + new Date().toDateString();
+  
+  if (localStorage.getItem(todayKey)) {
+    // Already requested — just increment votes
+    var existing = await db.from('requests')
+      .select('id, votes')
+      .eq('network', selectedNetwork)
+      .eq('app', selectedApp)
+      .eq('status', 'pending')
+      .order('votes', { ascending: false })
+      .limit(1);
+
+    if (existing.data && existing.data.length > 0) {
+      await db.from('requests')
+        .update({ votes: existing.data[0].votes + 1 })
+        .eq('id', existing.data[0].id);
+    }
+  } else {
+    // New request
+    await db.from('requests').insert({
+      network   : selectedNetwork,
+      app       : selectedApp,
+      votes     : 1,
+      visitor_id: visitorId,
+      status    : 'pending'
+    });
+    localStorage.setItem(todayKey, '1');
+  }
+
+  var s = document.getElementById('req-status');
+  s.style.display  = 'block';
+  s.style.color    = 'var(--green)';
+  s.textContent    = '✓ Request submitted — ItachiGoat is notified!';
+  btn.disabled     = false;
+  btn.textContent  = '📡 SUBMIT REQUEST';
+  btn.style.background = 'var(--green)';
+  btn.style.color  = '#000';
+
+  setTimeout(function() {
+    closeRequest();
+    btn.style.background = 'var(--yellow)';
+    btn.style.color = '#000';
+  }, 2000);
 }
 
 function closeInterstitial() {
