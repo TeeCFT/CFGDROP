@@ -118,6 +118,8 @@ footer{border-top:1px solid var(--border);padding:24px 0 20px;text-align:center;
 .nudge-text{font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;}
 .nudge-btn{padding:8px 20px;font-family:var(--font-d);font-size:10px;letter-spacing:2px;cursor:pointer;background:transparent;color:var(--cyan);border:1px solid var(--cyan);transition:all 0.15s;}
 .nudge-btn:hover{background:var(--cyan);color:#000;}
+.slider-bar{position:fixed;bottom:0;left:0;right:0;z-index:500;background:var(--s1);border-top:1px solid var(--border);height:60px;display:flex;align-items:center;justify-content:center;}
+.slider-bar-label{font-size:8px;color:var(--muted);letter-spacing:1px;position:absolute;top:4px;left:8px;}
 
 @media(max-width:600px){
   .grid{grid-template-columns:1fr;}
@@ -160,13 +162,12 @@ footer{border-top:1px solid var(--border);padding:24px 0 20px;text-align:center;
 
 <div class="wrap">
   <div class="hero">
-    <div class="hero-title">FREE <span class="highlight">PREMIUM VPN CONFIGS</span><br>UPDATED DAILY FROM ITACHIGOAT
-    <div class="hero-sub">SSH · VLESS · VMess · SlowDNS · UDP Custom — No signup. No limits. By ItachiGoat
+    <div class="hero-title">FREE <span class="highlight">PREMIUM VPN CONFIGS</span><br>UPDATED DAILY FROM ITACHIGOAT</div>
+    <div class="hero-sub">SSH · VLESS · VMess · SlowDNS · UDP Custom — No signup. No limits. By ItachiGoat</div>
     <div class="stats-row">
       <div class="stat"><div class="stat-num" id="total-configs">—</div><div class="stat-label">CONFIGS</div></div>
       <div class="stat"><div class="stat-num" id="total-downloads">—</div><div class="stat-label">DOWNLOADS</div></div>
       <div class="stat"><div class="stat-num">FREE</div><div class="stat-label">ALWAYS</div></div>
-    </div>
   </div>
 
   <!-- 320x50 — static, loads on page render, one placement only -->
@@ -574,16 +575,29 @@ function showNudge() {
 var selectedNetwork = null;
 var selectedApp     = null;
 
+function loadRequestAd() {
+  var wrap = document.getElementById('req-ad');
+  if (!wrap || wrap.dataset.loaded) return;
+  wrap.dataset.loaded = 'true';
+  var s1 = document.createElement('script');
+  s1.textContent = "atOptions={'key':'a63fd0dc7ea0888b1df2a07fc9dbb1d5','format':'iframe','height':50,'width':320,'params':{}};";
+  var s2 = document.createElement('script');
+  s2.src = 'https://www.highperformanceformat.com/a63fd0dc7ea0888b1df2a07fc9dbb1d5/invoke.js';
+  wrap.appendChild(s1);
+  wrap.appendChild(s2);
+}
+
 function openRequest() {
   selectedNetwork = null;
   selectedApp     = null;
   document.getElementById('req-status').style.display = 'none';
-  document.getElementById('submit-req-btn').textContent = '📡 SUBMIT REQUEST';
-  // Reset buttons
+  var btn = document.getElementById('submit-req-btn');
+  btn.textContent = '📡 SUBMIT REQUEST'; btn.style.background = 'var(--yellow)'; btn.style.color = '#000'; btn.disabled = false;
   document.querySelectorAll('.req-btn').forEach(function(b){
     b.classList.remove('selected','selected-yellow');
   });
   document.getElementById('req-modal').style.display = 'flex';
+  loadRequestAd();
 }
 
 function closeRequest() {
