@@ -118,8 +118,6 @@ footer{border-top:1px solid var(--border);padding:24px 0 20px;text-align:center;
 .nudge-text{font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;}
 .nudge-btn{padding:8px 20px;font-family:var(--font-d);font-size:10px;letter-spacing:2px;cursor:pointer;background:transparent;color:var(--cyan);border:1px solid var(--cyan);transition:all 0.15s;}
 .nudge-btn:hover{background:var(--cyan);color:#000;}
-.slider-bar{position:fixed;bottom:0;left:0;right:0;z-index:500;background:var(--s1);border-top:1px solid var(--border);height:60px;display:flex;align-items:center;justify-content:center;}
-.slider-bar-label{font-size:8px;color:var(--muted);letter-spacing:1px;position:absolute;top:4px;left:8px;}
 
 @media(max-width:600px){
   .grid{grid-template-columns:1fr;}
@@ -168,6 +166,7 @@ footer{border-top:1px solid var(--border);padding:24px 0 20px;text-align:center;
       <div class="stat"><div class="stat-num" id="total-configs">—</div><div class="stat-label">CONFIGS</div></div>
       <div class="stat"><div class="stat-num" id="total-downloads">—</div><div class="stat-label">DOWNLOADS</div></div>
       <div class="stat"><div class="stat-num">FREE</div><div class="stat-label">ALWAYS</div></div>
+    </div>
   </div>
 
   <!-- 320x50 — static, loads on page render, one placement only -->
