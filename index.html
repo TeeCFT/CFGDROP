@@ -644,6 +644,29 @@ async function submitRequest() {
     localStorage.setItem(todayKey, '1');
   }
 
+  // Send Telegram alert when votes hit 10+
+  var voteCheck = await db.from('requests')
+  .select('votes, network, app')
+  .eq('network', selectedNetwork)
+  .eq('app', selectedApp)
+  .eq('status', 'pending')
+  .order('votes', { ascending: false })
+  .limit(1);
+
+  if (voteCheck.data && voteCheck.data.length > 0) {
+    var votes = voteCheck.data[0].votes;
+    if (votes >= 10 && votes % 10 === 0) {
+     var msg = encodeURIComponent(
+       '🔥 CONFIG REQUEST ALERT\n\n' +
+       'Network: ' + selectedNetwork + '\n' +
+       'App: ' + selectedApp + '\n' +
+       'Votes: ' + votes + '\n\n' +
+       '👉 Drop this config on cfg.itachigoat.co.za'
+     );
+     fetch('https://api.telegram.org/bot8570825524:AAEpZz8_ul62Cz4enP3ptZNqp8PTYOlMY6Q/sendMessage?chat_id=7607029867&text=' + msg);
+  }
+}
+  
   var s = document.getElementById('req-status');
   s.style.display  = 'block';
   s.style.color    = 'var(--green)';
