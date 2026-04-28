@@ -717,8 +717,21 @@ async function incrementDownloads(id) {
   updateStats();
 }
 
-loadConfigs();
-  
+function checkAdBlock() {
+  var el = document.getElementById('ad-detect');
+  var isBlocked = !el || el.offsetHeight === 0 || el.offsetParent === null ||
+    window.getComputedStyle(el).display === 'none' ||
+    window.getComputedStyle(el).visibility === 'hidden';
+  if (isBlocked) {
+    document.getElementById('adblock-wall').style.display = 'flex';
+    document.getElementById('config-grid').innerHTML = '';
+  } else {
+    document.getElementById('adblock-wall').style.display = 'none';
+    loadConfigs();
+  }
+}
+setTimeout(checkAdBlock, 2000);
+
 </script>
 
 <!-- HilltopAds Video Slider -->
