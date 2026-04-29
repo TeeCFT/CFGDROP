@@ -11,11 +11,41 @@
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
+
   OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
       appId: "e8570777-dace-4284-b39c-351bc509b7a3",
+
+      // Disable auto prompt (we control timing)
+      promptOptions: {
+        slidedown: {
+          enabled: false
+        }
+      }
     });
   });
+
+  // ─────────────────────────────
+  // SMART PROMPT SYSTEM
+  // ─────────────────────────────
+
+  let pushPromptShown = false;
+
+  function triggerPushPrompt() {
+    if (pushPromptShown) return;
+
+    pushPromptShown = true;
+
+    window.OneSignalDeferred.push(function(OneSignal) {
+      OneSignal.Slidedown.promptPush();
+    });
+  }
+
+  // 1️⃣ Time-based trigger (8s after load)
+  setTimeout(() => {
+    triggerPushPrompt();
+  }, 8000);
+
 </script>
 <style>
 .ad-detect{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;}
