@@ -278,26 +278,34 @@ var countdownInterval = null;
 
 // ── ONESIGNAL — v16 correct API
 window.OneSignalDeferred = window.OneSignalDeferred || [];
+
 OneSignalDeferred.push(function(OneSignal) {
   OneSignal.init({
-    appId: 'e8570777-dace-4284-b39c-351bc509b7a3',
-    notifyButton: { enable: false },
+    appId: "e8570777-dace-4284-b39c-351bc509b7a3",
+    notifyButton: {
+      enable: true
+    },
     allowLocalhostAsSecureOrigin: true,
     promptOptions: {
       slidedown: {
+        enabled: true,
         prompts: [{
-          type: 'push',
-          autoPrompt: true,
+          type: "push",
+          autoPrompt: false,
           text: {
-            actionMessage: '🔥 Get notified when new configs drop!',
-            acceptButton: 'ALLOW',
-            cancelButton: 'LATER'
-          },
-          delay: { pageViews: 1, timeDelay: 5 }
+            actionMessage: "🔥 Get notified when new configs drop!",
+            acceptButton: "ALLOW",
+            cancelButton: "LATER"
+          }
         }]
       }
     }
   });
+
+  // 🔥 THIS is what makes the slide appear
+  setTimeout(() => {
+    OneSignal.Slidedown.promptPush();
+  }, 5000);
 });
 
 // ── ACTIVITY COUNTER
